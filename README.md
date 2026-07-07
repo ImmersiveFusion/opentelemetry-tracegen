@@ -252,7 +252,7 @@ Flags:
 
 **Normal** (default) adds all remaining traditional services and scenarios including chaos/failure modes.
 
-**Heavy** adds all 8 AI services and 4 AI agentic scenarios (RAG Search, AI Chatbot, Content Moderation, Multi-Step Agent).
+**Heavy** adds all 8 AI services and 4 of the 12 AI agentic scenarios (RAG Search, AI Chatbot, Content Moderation, Multi-Step Agent).
 
 ### Aggressiveness Levels
 

@@ -16,22 +16,25 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	logapi "go.opentelemetry.io/otel/log"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var tracerPool = map[string][]trace.Tracer{}
-var loggerPool = map[string][]logapi.Logger{}
-var providers []*sdktrace.TracerProvider
-var logProviders []*sdklog.LoggerProvider
+var (
+	tracerPool   = map[string][]trace.Tracer{}
+	loggerPool   = map[string][]logapi.Logger{}
+	providers    []*sdktrace.TracerProvider
+	logProviders []*sdklog.LoggerProvider
+)
 
 // noopTracer is returned for services not in the current complexity tier
-var noopTracer = trace.NewNoopTracerProvider().Tracer("")
+var noopTracer = noop.NewTracerProvider().Tracer("")
 
 // tracer returns a random instance's tracer for the given service (multi-pod realism).
 // Returns a noop tracer if the service is not in the current complexity tier.
@@ -160,25 +163,25 @@ var levels = map[int]levelConfig{
 	10: {10, 3, 4, "SCREAM (~350/s)"},
 }
 
-// Global error multiplier — set by -errors flag, used by errorChance()
+// Global error multiplier: set by -errors flag, used by errorChance()
 var errorMultiplier float64
 
-// consumersEnabled — when false, all async consumers are dead (queue messages pile up)
+// consumersEnabled: when false, all async consumers are dead (queue messages pile up)
 var consumersEnabled bool
 
-// insecureMode — when true, use plaintext gRPC (no TLS) for local backends
+// insecureMode: when true, use plaintext gRPC (no TLS) for local backends
 var insecureMode bool
 
-// noAIBackends — when true, AI services are excluded (AI spans emit errors)
+// noAIBackends: when true, AI services are excluded (AI spans emit errors)
 var noAIBackends bool
 
-// aiOnly — when true, only AI agentic scenarios are run
+// aiOnly: when true, only AI agentic scenarios are run
 var aiOnly bool
 
-// complexity — controls how many services/pods/scenarios are active
+// complexity: controls how many services/pods/scenarios are active
 var complexity string // "light", "normal", "heavy"
 
-// logsDisabled — when true, no OTel log records are emitted
+// logsDisabled: when true, no OTel log records are emitted
 var logsDisabled bool
 
 // errorChance scales a base error probability by the global error multiplier.
@@ -187,12 +190,12 @@ func errorChance(baseRate float64) bool {
 	return rand.Float64() < baseRate*errorMultiplier
 }
 
-// Console verbosity levels — controls ONLY the periodic "traces sent" heartbeat.
+// Console verbosity levels: controls ONLY the periodic "traces sent" heartbeat.
 // Distinct from the OTel log records the generator emits. The startup banner
 // ("what it's doing") and genuine errors (stderr) always surface, at any level.
 const (
 	logSilent = iota // banner + errors only, no heartbeat
-	logError         // errors only — suppresses heartbeat (the sane container default)
+	logError         // errors only: suppresses heartbeat (the sane container default)
 	logInfo          // banner + periodic heartbeat (CLI default, current behavior)
 	logDebug         // reserved for future verbose diagnostics
 )
@@ -219,12 +222,12 @@ func resolveLogLevel(flagVal string, quiet bool) int {
 	case "debug":
 		return logDebug
 	default:
-		log.Fatalf("invalid -log-level %q — must be silent, error, info, or debug", v)
+		log.Fatalf("invalid -log-level %q, must be silent, error, info, or debug", v)
 		return logInfo
 	}
 }
 
-// infof / infoln write to stdout only at info level or above — suppressed by
+// infof writes to stdout only at info level or above: suppressed by
 // -quiet, -log-level=error, and -log-level=silent.
 func infof(format string, a ...any) {
 	if logLevel >= logInfo {
@@ -232,14 +235,8 @@ func infof(format string, a ...any) {
 	}
 }
 
-func infoln(a ...any) {
-	if logLevel >= logInfo {
-		fmt.Println(a...)
-	}
-}
-
 // bannerf / bannerln write the startup "what it's doing" intro to stdout
-// regardless of log level — even under -quiet, -log-level=error, or =silent.
+// regardless of log level, even under -quiet, -log-level=error, or =silent.
 // The banner is operator orientation, not chatter, so it is never suppressed.
 func bannerf(format string, a ...any) {
 	fmt.Printf(format, a...)
@@ -249,7 +246,7 @@ func bannerln(a ...any) {
 	fmt.Println(a...)
 }
 
-// errorf writes to stderr regardless of log level — errors are always shown,
+// errorf writes to stderr regardless of log level: errors are always shown,
 // even under -log-level=silent.
 func errorf(format string, a ...any) {
 	fmt.Fprintf(os.Stderr, format, a...)
@@ -267,7 +264,7 @@ func main() {
 	complexityFlag := flag.String("complexity", "normal", "topology complexity: light, normal, heavy")
 	noLogsFlag := flag.Bool("no-logs", false, "disable OTel log record emission (traces only)")
 	logLevelFlag := flag.String("log-level", "", "console verbosity: silent, error, info, debug (default info; env TRACEGEN_LOG_LEVEL)")
-	quietFlag := flag.Bool("quiet", false, "errors only — suppress the periodic 'traces sent' heartbeat (alias for -log-level=error); the startup banner and errors always print")
+	quietFlag := flag.Bool("quiet", false, "errors only: suppress the periodic 'traces sent' heartbeat (alias for -log-level=error); the startup banner and errors always print")
 	flag.Parse()
 	logLevel = resolveLogLevel(*logLevelFlag, *quietFlag)
 	consumersEnabled = !*noConsumers
@@ -277,7 +274,7 @@ func main() {
 	complexity = *complexityFlag
 	logsDisabled = *noLogsFlag
 	if complexity != "light" && complexity != "normal" && complexity != "heavy" {
-		log.Fatalf("invalid complexity %q — must be light, normal, or heavy", complexity)
+		log.Fatalf("invalid complexity %q, must be light, normal, or heavy", complexity)
 	}
 
 	endpoint := *endpointFlag
@@ -290,17 +287,17 @@ func main() {
 
 	cfg, ok := levels[*level]
 	if !ok {
-		log.Fatalf("invalid level %d — must be 1-10", *level)
+		log.Fatalf("invalid level %d, must be 1-10", *level)
 	}
 	if *errors < 0 || *errors > 10 {
-		log.Fatalf("invalid errors %d — must be 0-10", *errors)
+		log.Fatalf("invalid errors %d, must be 0-10", *errors)
 	}
 	errorMultiplier = float64(*errors) / 5.0 // 0=0x, 5=1x, 10=2x
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	// Service definitions with replica ranges — pods are generated at startup
+	// Service definitions with replica ranges: pods are generated at startup
 	// tier: "light" = core backbone, "normal" = full traditional, "heavy" = includes AI
 	type serviceSpec struct {
 		name    string // service name
@@ -308,11 +305,11 @@ func main() {
 		hash    string // deployment hash (6 hex chars)
 		minPods int    // minimum replicas
 		maxPods int    // maximum replicas
-		isAI    bool   // AI service — excluded when -no-ai-backends
+		isAI    bool   // AI service: excluded when -no-ai-backends
 		tier    string // minimum complexity tier to include this service
 	}
 	services := []serviceSpec{
-		// Core backbone (light) — 10 services
+		// Core backbone (light): 10 services
 		{"web-frontend", "web-frontend", "d7b48c", 2, 4, false, "light"},
 		{"api-gateway", "api-gateway", "e5a21b", 3, 6, false, "light"},
 		{"order-service", "order-svc", "f3c91a", 2, 5, false, "light"},
@@ -323,7 +320,7 @@ func main() {
 		{"auth-service", "auth-svc", "b47e2f", 3, 5, false, "light"},
 		{"product-service", "product-svc", "e85c6f", 3, 5, false, "light"},
 		{"cart-service", "cart-svc", "d72b5e", 2, 4, false, "light"},
-		// Extended traditional (normal) — adds 10 more
+		// Extended traditional (normal): adds 10 more
 		{"notification-service", "notif-svc", "c59f2a", 2, 4, false, "normal"},
 		{"search-service", "search-svc", "f85c3d", 2, 4, false, "normal"},
 		{"scheduler-service", "scheduler-svc", "a93d1e", 1, 1, false, "normal"},
@@ -334,7 +331,7 @@ func main() {
 		{"tax-service", "tax-svc", "c39a1d", 1, 2, false, "normal"},
 		{"analytics-service", "analytics-svc", "d41b2e", 3, 5, false, "normal"},
 		{"config-service", "config-svc", "e52c3f", 1, 2, false, "normal"},
-		// AI services (heavy) — adds 8 more
+		// AI services (heavy): adds 8 more
 		{"llm-gateway", "llm-gw", "a23b4c", 2, 5, true, "heavy"},
 		{"embedding-service", "embed-svc", "b34c5d", 2, 4, true, "heavy"},
 		{"vector-db-service", "vecdb-svc", "c45d6e", 2, 3, true, "heavy"},
@@ -411,10 +408,10 @@ func main() {
 	}
 	defer func() {
 		for _, tp := range providers {
-			tp.Shutdown(context.Background())
+			_ = tp.Shutdown(context.Background())
 		}
 		for _, lp := range logProviders {
-			lp.Shutdown(context.Background())
+			_ = lp.Shutdown(context.Background())
 		}
 	}()
 
@@ -429,7 +426,7 @@ func main() {
 		tier     string // minimum complexity tier: "light", "normal", "heavy"
 	}
 	allScenarios := []namedScenario{
-		// Core scenarios (light) — clean demo flows
+		// Core scenarios (light): clean demo flows
 		{"Create Order", createOrderFlow, false, "traditional", "light"},
 		{"Search & Browse", searchAndBrowseFlow, false, "traditional", "light"},
 		{"User Login", userLoginFlow, false, "traditional", "light"},

@@ -1,12 +1,12 @@
 # Contributing to TraceGen
 
-Thanks for your interest in TraceGen — a single-binary OpenTelemetry trace generator. Bug reports, feature ideas, code, and docs are all welcome.
+Thanks for your interest in TraceGen, a single-binary OpenTelemetry trace generator. Bug reports, feature ideas, code, and docs are all welcome.
 
 ## Ways to contribute
 
-- **Report a bug** or **request a feature** — open an issue with one of the [issue templates](.github/ISSUE_TEMPLATE).
-- **Add your deployment** — running TraceGen somewhere? Add it to [`WHERE-TRACEGEN-RUNS.md`](WHERE-TRACEGEN-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
-- **Send a pull request** — see below.
+- **Report a bug** or **request a feature**: open an issue with one of the [issue templates](.github/ISSUE_TEMPLATE).
+- **Add your deployment**: running TraceGen somewhere? Add it to [`WHERE-TRACEGEN-RUNS.md`](WHERE-TRACEGEN-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
+- **Send a pull request**: see below.
 
 ## Building from source
 
@@ -30,7 +30,7 @@ GOOS=windows GOARCH=amd64 go build -o tracegen.exe ./cmd/tracegen
 ## Pull requests
 
 1. Fork the repo and branch from `main`.
-2. Keep changes focused — one logical change per PR.
+2. Keep changes focused: one logical change per PR.
 3. Run `go build ./...` and `go vet ./...` before pushing.
 4. Use clear, conventional commit messages (`feat:`, `fix:`, `docs:`, …).
 5. Open the PR against `main` and describe what changed and why.
@@ -56,7 +56,7 @@ backward compatibility with historical tags, but new releases should always be
 
 Note: the workflow evaluates the tag trigger **at the moment the tag is
 pushed**. If a tag was pushed before a trigger fix landed on `main`, fixing the
-trigger does not retroactively run it — push a new (higher) version tag instead.
+trigger does not retroactively run it. Push a new (higher) version tag instead.
 
 ## Reporting issues
 

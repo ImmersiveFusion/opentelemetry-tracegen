@@ -1,0 +1,58 @@
+name: CI
+
+# Quality gate on every push and PR: static analysis, formatting, tests, and
+# the house R-LOCAL-005 glyph guard. Additive to release.yml (which is unchanged).
+# Action versions are pinned.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      # Fail closed on em/en dashes and arrow glyphs anywhere in the tree.
+      # ASCII only: comma/colon/parens, or -> in flow text. R-LOCAL-005.
+      - name: No em dashes or arrows (R-LOCAL-005)
+        run: |
+          if git grep -nP '[\x{2013}\x{2014}\x{2190}-\x{2194}\x{21D2}]' -- .; then
+            echo "::error::Found em/en dash or arrow glyphs. Use ASCII (comma/colon/parens, or -> ). R-LOCAL-005."
+            exit 1
+          fi
+
+      - name: gofumpt (fail on diff)
+        run: |
+          go install mvdan.cc/gofumpt@v0.7.0
+          files=$(gofumpt -l .)
+          if [ -n "$files" ]; then
+            echo "::error::gofumpt would reformat these files:"
+            echo "$files"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v7 # v7 is required for golangci-lint v2
+        with:
+          # Must be built with a Go >= our go.mod target (1.25), else it refuses
+          # to load. Renovate keeps this current.
+          version: v2.12.2
+
+      - name: go build
+        run: go build ./...
+
+      - name: go test (race + cover)
+        run: go test -race -cover ./...

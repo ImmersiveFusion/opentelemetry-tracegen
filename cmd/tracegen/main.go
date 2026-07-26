@@ -27,6 +27,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// version is stamped at release time: goreleaser -X main.version for the tarball
+// binaries, the Dockerfile VERSION build-arg for the container image. Local and dev
+// builds report "dev". It appears in the startup banner.
+var version = "dev"
+
 var (
 	tracerPool   = map[string][]trace.Tracer{}
 	loggerPool   = map[string][]logapi.Logger{}
@@ -470,7 +475,7 @@ func main() {
 
 	errorLabels := []string{"none", "rare", "rare", "low", "low", "normal", "elevated", "high", "high", "extreme", "chaos"}
 	bannerln()
-	bannerf("OpenTelemetry Trace Generator (%d services, %d pods, %d scenarios)\n", totalServices, len(pods), len(scenarios))
+	bannerf("OpenTelemetry Trace Generator %s (%d services, %d pods, %d scenarios)\n", version, totalServices, len(pods), len(scenarios))
 	bannerf("Endpoint: %s  Complexity: %s\n", endpoint, complexity)
 	bannerf("Level %d: %s  (tick=%dms, burst=%d-%d)  Errors: %s (%d)\n",
 		*level, cfg.label, cfg.tickMs, cfg.burstMin, cfg.burstMax, errorLabels[*errors], *errors)

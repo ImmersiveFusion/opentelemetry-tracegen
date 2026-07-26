@@ -13,8 +13,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 ARG TARGETOS TARGETARCH
+# VERSION is stamped into the banner via -X main.version. release.yml passes the git
+# tag; local `docker build` defaults to "dev". Keep in sync with .goreleaser.yml.
+ARG VERSION=dev
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go build -ldflags="-s -w" -o /out/tracegen ./cmd/tracegen
+    go build -ldflags="-s -w -X main.version=${VERSION}" -o /out/tracegen ./cmd/tracegen
 
 # distroless/static: no shell, CA certs included (for OTLP/TLS egress), runs as non-root.
 FROM gcr.io/distroless/static-debian12:nonroot

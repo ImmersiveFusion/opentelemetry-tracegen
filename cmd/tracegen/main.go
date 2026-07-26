@@ -5,13 +5,14 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
+	"github.com/ImmersiveFusion/if-opentelemetry-tracegen/internal/health"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -94,7 +95,7 @@ func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostNam
 	}
 	exporter, err := otlptracegrpc.New(ctx, opts...)
 	if err != nil {
-		log.Fatalf("failed to create exporter for %s: %v", serviceName, err)
+		fatal("failed to create trace exporter", "service", serviceName, "err", err)
 	}
 
 	tp := sdktrace.NewTracerProvider(
@@ -124,7 +125,7 @@ func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostNam
 		}
 		logExporter, err := otlploggrpc.New(ctx, logOpts...)
 		if err != nil {
-			log.Fatalf("failed to create log exporter for %s: %v", serviceName, err)
+			fatal("failed to create log exporter", "service", serviceName, "err", err)
 		}
 		lp := sdklog.NewLoggerProvider(
 			sdklog.WithProcessor(sdklog.NewSimpleProcessor(logExporter)),
@@ -190,21 +191,18 @@ func errorChance(baseRate float64) bool {
 	return rand.Float64() < baseRate*errorMultiplier
 }
 
-// Console verbosity levels: controls ONLY the periodic "traces sent" heartbeat.
-// Distinct from the OTel log records the generator emits. The startup banner
-// ("what it's doing") and genuine errors (stderr) always surface, at any level.
-const (
-	logSilent = iota // banner + errors only, no heartbeat
-	logError         // errors only: suppresses heartbeat (the sane container default)
-	logInfo          // banner + periodic heartbeat (CLI default, current behavior)
-	logDebug         // reserved for future verbose diagnostics
-)
-
-var logLevel = logInfo
+// logLevelVar is the dynamic level for the leveled slog stream (the periodic "traces
+// sent" heartbeat is Info). Distinct from the OTel log records the generator emits.
+// The startup banner ("what it's doing") and genuine errors always surface, at any
+// level: the banner via bannerf (a deliberate always-on write, since slog has no
+// "always" severity) and errors via slog.Error / fatal (the floor is never above Error).
+var logLevelVar = new(slog.LevelVar) // zero value = LevelInfo
 
 // resolveLogLevel applies precedence: -quiet > -log-level flag > TRACEGEN_LOG_LEVEL env
 // (containers set env, not flags) > default (info). Mirrors the -headers/env pattern below.
-func resolveLogLevel(flagVal string, quiet bool) int {
+// silent and error both map to "errors only, no heartbeat" (kept as distinct flag
+// spellings for compatibility); the banner and errors print regardless.
+func resolveLogLevel(flagVal string, quiet bool) slog.Level {
 	v := flagVal
 	if v == "" {
 		v = os.Getenv("TRACEGEN_LOG_LEVEL")
@@ -214,42 +212,30 @@ func resolveLogLevel(flagVal string, quiet bool) int {
 	}
 	switch strings.ToLower(strings.TrimSpace(v)) {
 	case "", "info":
-		return logInfo
-	case "silent", "none", "off":
-		return logSilent
-	case "error", "errors":
-		return logError
+		return slog.LevelInfo
+	case "silent", "none", "off", "error", "errors":
+		return slog.LevelError
 	case "debug":
-		return logDebug
+		return slog.LevelDebug
 	default:
-		log.Fatalf("invalid -log-level %q, must be silent, error, info, or debug", v)
-		return logInfo
+		fatal("invalid -log-level, must be silent, error, info, or debug", "value", v)
+		return slog.LevelInfo
 	}
 }
 
-// infof writes to stdout only at info level or above: suppressed by
-// -quiet, -log-level=error, and -log-level=silent.
-func infof(format string, a ...any) {
-	if logLevel >= logInfo {
-		fmt.Printf(format, a...)
-	}
-}
+// bannerf / bannerln write the startup "what it's doing" intro to stderr regardless of
+// log level, even under -quiet / -log-level=error / =silent. The banner is operator
+// orientation, not a leveled log, so it is never suppressed; slog has no "always"
+// severity, so this is a deliberate direct write. It shares stderr with the slog stream
+// so the two stay ordered. sos-beacon uses the same pattern for cross-binary consistency.
+func bannerf(format string, a ...any) { fmt.Fprintf(os.Stderr, format, a...) }
+func bannerln(a ...any)               { fmt.Fprintln(os.Stderr, a...) }
 
-// bannerf / bannerln write the startup "what it's doing" intro to stdout
-// regardless of log level, even under -quiet, -log-level=error, or =silent.
-// The banner is operator orientation, not chatter, so it is never suppressed.
-func bannerf(format string, a ...any) {
-	fmt.Printf(format, a...)
-}
-
-func bannerln(a ...any) {
-	fmt.Println(a...)
-}
-
-// errorf writes to stderr regardless of log level: errors are always shown,
-// even under -log-level=silent.
-func errorf(format string, a ...any) {
-	fmt.Fprintf(os.Stderr, format, a...)
+// fatal logs at error level and exits non-zero. slog deliberately omits Fatal; this is
+// the idiomatic replacement for an unrecoverable startup error.
+func fatal(msg string, args ...any) {
+	slog.Error(msg, args...)
+	os.Exit(1)
 }
 
 func main() {
@@ -265,8 +251,10 @@ func main() {
 	noLogsFlag := flag.Bool("no-logs", false, "disable OTel log record emission (traces only)")
 	logLevelFlag := flag.String("log-level", "", "console verbosity: silent, error, info, debug (default info; env TRACEGEN_LOG_LEVEL)")
 	quietFlag := flag.Bool("quiet", false, "errors only: suppress the periodic 'traces sent' heartbeat (alias for -log-level=error); the startup banner and errors always print")
+	healthAddrFlag := flag.String("health-addr", ":8080", "address for the /readyz and /healthz HTTP endpoints; empty disables")
 	flag.Parse()
-	logLevel = resolveLogLevel(*logLevelFlag, *quietFlag)
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevelVar})))
+	logLevelVar.Set(resolveLogLevel(*logLevelFlag, *quietFlag))
 	consumersEnabled = !*noConsumers
 	insecureMode = *insecureFlag
 	noAIBackends = *noAIBackendsFlag
@@ -274,7 +262,7 @@ func main() {
 	complexity = *complexityFlag
 	logsDisabled = *noLogsFlag
 	if complexity != "light" && complexity != "normal" && complexity != "heavy" {
-		log.Fatalf("invalid complexity %q, must be light, normal, or heavy", complexity)
+		fatal("invalid -complexity, must be light, normal, or heavy", "value", complexity)
 	}
 
 	endpoint := *endpointFlag
@@ -287,10 +275,10 @@ func main() {
 
 	cfg, ok := levels[*level]
 	if !ok {
-		log.Fatalf("invalid level %d, must be 1-10", *level)
+		fatal("invalid -level, must be 1-10", "value", *level)
 	}
 	if *errors < 0 || *errors > 10 {
-		log.Fatalf("invalid errors %d, must be 0-10", *errors)
+		fatal("invalid -errors, must be 0-10", "value", *errors)
 	}
 	errorMultiplier = float64(*errors) / 5.0 // 0=0x, 5=1x, 10=2x
 
@@ -418,6 +406,19 @@ func main() {
 	ticker := time.NewTicker(time.Duration(cfg.tickMs) * time.Millisecond)
 	defer ticker.Stop()
 
+	// Liveness: the generator beats every tick; stale beats mean a hung loop. The
+	// window is generous relative to the tick (10x, floored at a minute) so a slow
+	// preset never triggers a false restart.
+	staleAfter := 10 * time.Duration(cfg.tickMs) * time.Millisecond
+	if staleAfter < time.Minute {
+		staleAfter = time.Minute
+	}
+	hm := health.New(staleAfter)
+	if *healthAddrFlag != "" {
+		hm.Serve(*healthAddrFlag, func(err error) { slog.Error("health server stopped", "err", err) })
+		slog.Info("health endpoints serving", "addr", *healthAddrFlag, "stale_after", staleAfter.String())
+	}
+
 	type namedScenario struct {
 		name     string
 		fn       func(context.Context)
@@ -474,8 +475,7 @@ func main() {
 	bannerf("Level %d: %s  (tick=%dms, burst=%d-%d)  Errors: %s (%d)\n",
 		*level, cfg.label, cfg.tickMs, cfg.burstMin, cfg.burstMax, errorLabels[*errors], *errors)
 	if aiOnly && noAIBackends {
-		errorf("Error: -ai-only and -no-ai-backends are mutually exclusive.\n")
-		os.Exit(1)
+		fatal("-ai-only and -no-ai-backends are mutually exclusive")
 	}
 	if aiOnly {
 		bannerln("Mode: AI-only (traditional scenarios excluded)")
@@ -484,25 +484,26 @@ func main() {
 		bannerln("Mode: No AI backends (AI services excluded)")
 	}
 	if len(scenarios) == 0 {
-		errorf("Error: no scenarios available with current flags.\n")
-		os.Exit(1)
+		fatal("no scenarios available with current flags")
 	}
 	bannerln("Press Ctrl+C to stop.")
 	bannerln()
 
+	hm.Ready() // startup complete: /readyz now reports 200
 	sent := 0
 	for {
 		select {
 		case <-ctx.Done():
-			infof("\nShutting down, flushing %d traces...\n", sent)
+			slog.Info("shutting down, flushing traces", "sent", sent)
 			return
 		case <-ticker.C:
+			hm.Beat() // forward progress: keeps /healthz green
 			burst := cfg.burstMin + rand.Intn(cfg.burstMax-cfg.burstMin+1)
 			for b := 0; b < burst; b++ {
 				s := scenarios[rand.Intn(len(scenarios))]
 				sent++
 				if sent%50 == 0 {
-					infof("[%s] %d traces sent  (%d services, %d pods, %d scenarios)\n", time.Now().Format("15:04:05"), sent, totalServices, len(pods), len(scenarios))
+					slog.Info("traces sent", "sent", sent, "services", totalServices, "pods", len(pods), "scenarios", len(scenarios))
 				}
 				go s.fn(ctx)
 			}

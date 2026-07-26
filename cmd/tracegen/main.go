@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ImmersiveFusion/if-opentelemetry-tracegen/internal/health"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -250,6 +251,7 @@ func main() {
 	noLogsFlag := flag.Bool("no-logs", false, "disable OTel log record emission (traces only)")
 	logLevelFlag := flag.String("log-level", "", "console verbosity: silent, error, info, debug (default info; env TRACEGEN_LOG_LEVEL)")
 	quietFlag := flag.Bool("quiet", false, "errors only: suppress the periodic 'traces sent' heartbeat (alias for -log-level=error); the startup banner and errors always print")
+	healthAddrFlag := flag.String("health-addr", ":8080", "address for the /readyz and /healthz HTTP endpoints; empty disables")
 	flag.Parse()
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevelVar})))
 	logLevelVar.Set(resolveLogLevel(*logLevelFlag, *quietFlag))
@@ -404,6 +406,19 @@ func main() {
 	ticker := time.NewTicker(time.Duration(cfg.tickMs) * time.Millisecond)
 	defer ticker.Stop()
 
+	// Liveness: the generator beats every tick; stale beats mean a hung loop. The
+	// window is generous relative to the tick (10x, floored at a minute) so a slow
+	// preset never triggers a false restart.
+	staleAfter := 10 * time.Duration(cfg.tickMs) * time.Millisecond
+	if staleAfter < time.Minute {
+		staleAfter = time.Minute
+	}
+	hm := health.New(staleAfter)
+	if *healthAddrFlag != "" {
+		hm.Serve(*healthAddrFlag, func(err error) { slog.Error("health server stopped", "err", err) })
+		slog.Info("health endpoints serving", "addr", *healthAddrFlag, "stale_after", staleAfter.String())
+	}
+
 	type namedScenario struct {
 		name     string
 		fn       func(context.Context)
@@ -474,6 +489,7 @@ func main() {
 	bannerln("Press Ctrl+C to stop.")
 	bannerln()
 
+	hm.Ready() // startup complete: /readyz now reports 200
 	sent := 0
 	for {
 		select {
@@ -481,6 +497,7 @@ func main() {
 			slog.Info("shutting down, flushing traces", "sent", sent)
 			return
 		case <-ticker.C:
+			hm.Beat() // forward progress: keeps /healthz green
 			burst := cfg.burstMin + rand.Intn(cfg.burstMax-cfg.burstMin+1)
 			for b := 0; b < burst; b++ {
 				s := scenarios[rand.Intn(len(scenarios))]

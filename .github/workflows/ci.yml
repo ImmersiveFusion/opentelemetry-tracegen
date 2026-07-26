@@ -24,9 +24,11 @@ jobs:
 
       # Fail closed on em/en dashes and arrow glyphs anywhere in the tree.
       # ASCII only: comma/colon/parens, or -> in flow text. R-LOCAL-005.
+      # -I skips binary files (e.g. .img/*.gif) whose bytes can coincidentally
+      # match the glyph range.
       - name: No em dashes or arrows (R-LOCAL-005)
         run: |
-          if git grep -nP '[\x{2013}\x{2014}\x{2190}-\x{2194}\x{21D2}]' -- .; then
+          if git grep -nIP '[\x{2013}\x{2014}\x{2190}-\x{2194}\x{21D2}]' -- .; then
             echo "::error::Found em/en dash or arrow glyphs. Use ASCII (comma/colon/parens, or -> ). R-LOCAL-005."
             exit 1
           fi

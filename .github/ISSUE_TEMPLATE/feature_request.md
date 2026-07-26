@@ -9,7 +9,7 @@ labels: enhancement
 What are you trying to do that TraceGen can't do today?
 
 **Proposed solution**
-What you'd like to see — a new flag, scenario, span shape, etc.
+What you'd like to see: a new flag, scenario, span shape, etc.
 
 **Alternatives**
 Anything you've tried or considered.

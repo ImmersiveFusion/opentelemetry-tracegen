@@ -114,14 +114,14 @@ func createOrderFlow(ctx context.Context) {
 	publish.End()
 	order.End()
 
-	// Queue delivery delay — message sits in broker before consumer picks up
+	// Queue delivery delay: message sits in broker before consumer picks up
 	sleep(50, 300)
 
 	if !consumersEnabled {
 		return // messages pile up, no consumers running
 	}
 
-	// 5% chance: message lost — payment consumer never fires
+	// 5% chance: message lost, payment consumer never fires
 	if errorChance(0.05) {
 		return
 	}
@@ -172,7 +172,7 @@ func createOrderFlow(ctx context.Context) {
 	// Queue delivery delay
 	sleep(30, 150)
 
-	// 5% chance: message lost — inventory consumer never fires
+	// 5% chance: message lost, inventory consumer never fires
 	if errorChance(0.05) {
 		return
 	}
@@ -203,7 +203,7 @@ func createOrderFlow(ctx context.Context) {
 	// Queue delivery delay
 	sleep(20, 100)
 
-	// 5% chance: message lost — notification consumer never fires
+	// 5% chance: message lost, notification consumer never fires
 	if errorChance(0.05) {
 		return
 	}
@@ -379,7 +379,7 @@ func userLoginFlow(ctx context.Context) {
 	session.End()
 }
 
-// Payment failure flow — Stripe returns 402
+// Payment failure flow: Stripe returns 402
 func failedPaymentFlow(ctx context.Context) {
 	ctx, ui := tracer("web-frontend").Start(ctx, "PlaceOrder",
 		trace.WithSpanKind(trace.SpanKindClient),
@@ -474,7 +474,7 @@ func failedPaymentFlow(ctx context.Context) {
 	notify.End()
 }
 
-// Bulk notification flow — admin triggers digest from UI
+// Bulk notification flow: admin triggers digest from UI
 func bulkNotificationFlow(ctx context.Context) {
 	ctx, ui := tracer("web-frontend").Start(ctx, "TriggerDigest",
 		trace.WithSpanKind(trace.SpanKindClient),
@@ -565,7 +565,7 @@ func bulkNotificationFlow(ctx context.Context) {
 	}
 }
 
-// Health check flow — lightweight, high-frequency pings across services
+// Health check flow: lightweight, high-frequency pings across services
 func healthCheckFlow(ctx context.Context) {
 	ctx, ui := tracer("web-frontend").Start(ctx, "HealthDashboard",
 		trace.WithSpanKind(trace.SpanKindClient),
@@ -626,7 +626,7 @@ func healthCheckFlow(ctx context.Context) {
 	}
 }
 
-// Inventory sync flow — admin triggers from UI
+// Inventory sync flow: admin triggers from UI
 func inventorySyncFlow(ctx context.Context) {
 	ctx, ui := tracer("web-frontend").Start(ctx, "TriggerInventorySync",
 		trace.WithSpanKind(trace.SpanKindClient),
@@ -708,7 +708,7 @@ func inventorySyncFlow(ctx context.Context) {
 	reindex.End()
 }
 
-// Scheduled report — scheduler-service is the root, no UI or gateway entry point.
+// Scheduled report: scheduler-service is the root, no UI or gateway entry point.
 // Creates a long chain: scheduler -> order -> inventory -> cache -> notification
 func scheduledReportFlow(ctx context.Context) {
 	ctx, scheduler := tracer("scheduler-service").Start(ctx, "CronJob: DailyReport",
@@ -722,7 +722,7 @@ func scheduledReportFlow(ctx context.Context) {
 	defer scheduler.End()
 	sleep(5, 15)
 
-	// Auth check — scheduler authenticates via service account
+	// Auth check: scheduler authenticates via service account
 	_, auth := tracer("auth-service").Start(ctx, "ValidateServiceAccount",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -834,7 +834,7 @@ func scheduledReportFlow(ctx context.Context) {
 	notify.End()
 }
 
-// Stripe webhook — external callback entering at payment-service directly (no gateway).
+// Stripe webhook: external callback entering at payment-service directly (no gateway).
 // payment-service -> auth-service (verify sig) -> order-service -> cache -> notification
 func stripeWebhookFlow(ctx context.Context) {
 	ctx, webhook := tracer("payment-service").Start(ctx, "POST /webhooks/stripe",
@@ -896,7 +896,7 @@ func stripeWebhookFlow(ctx context.Context) {
 	dbUpdate.End()
 	orderUpdate.End()
 
-	// Cache invalidation — diamond dependency (both order-service and payment-service hit cache)
+	// Cache invalidation: diamond dependency (both order-service and payment-service hit cache)
 	_, cacheInval := tracer("cache-service").Start(ctx, "Redis DEL order-cache",
 		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(
@@ -942,7 +942,7 @@ func stripeWebhookFlow(ctx context.Context) {
 	notify.End()
 }
 
-// Recommendation flow — scatter-gather / bowtie pattern.
+// Recommendation flow: scatter-gather / bowtie pattern.
 // web-frontend -> api-gateway -> recommendation-service -> fan-out to search+inventory+user -> fan-in -> cache
 func recommendationFlow(ctx context.Context) {
 	ctx, ui := tracer("web-frontend").Start(ctx, "GetRecommendations",
@@ -980,7 +980,7 @@ func recommendationFlow(ctx context.Context) {
 	sleep(2, 8)
 	auth.End()
 
-	// Recommendation engine — the bowtie center
+	// Recommendation engine: the bowtie center
 	ctx2, recEngine := tracer("recommendation-service").Start(ctx, "ComputeRecommendations",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1092,7 +1092,7 @@ func addToCartFlow(ctx context.Context) {
 	defer gateway.End()
 	sleep(3, 10)
 
-	// Feature flag check — show bundled recommendations?
+	// Feature flag check: show bundled recommendations?
 	_, flag := tracer("config-service").Start(ctx, "GetFeatureFlag",
 		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(
@@ -1206,7 +1206,7 @@ func addToCartFlow(ctx context.Context) {
 	analyticsConsumer.End()
 }
 
-// Full checkout flow — THE monster chain touching nearly every service.
+// Full checkout flow: THE monster chain touching nearly every service.
 // web -> gw -> auth -> cart -> product -> tax+shipping(parallel) -> order -> fraud -> payment -> stripe
 // -> inventory -> shipping(label) -> cache -> analytics -> [queue] -> notification -> email
 func fullCheckoutFlow(ctx context.Context) {
@@ -1539,7 +1539,7 @@ func fullCheckoutFlow(ctx context.Context) {
 	notify.End()
 }
 
-// Shipping update — carrier webhook enters at shipping-service directly (no UI/gateway).
+// Shipping update: carrier webhook enters at shipping-service directly (no UI/gateway).
 // shipping -> auth -> order -> cache -> [queue] -> notification -> email -> analytics
 func shippingUpdateFlow(ctx context.Context) {
 	shippingStatus := []string{"in_transit", "out_for_delivery", "delivered"}[rand.Intn(3)]
@@ -1672,7 +1672,7 @@ func shippingUpdateFlow(ctx context.Context) {
 	}
 }
 
-// Saga compensation — payment fails after order+inventory committed, triggering reverse compensations.
+// Saga compensation: payment fails after order+inventory committed, triggering reverse compensations.
 // Forward: web -> gw -> auth -> order -> inventory -> fraud -> payment (3 retries, all fail)
 // Reverse: saga.compensate -> parallel [cancel order, release inventory, void shipping, notify+email]
 func sagaCompensationFlow(ctx context.Context) {
@@ -1711,7 +1711,7 @@ func sagaCompensationFlow(ctx context.Context) {
 
 	orderID := randomOrderID()
 
-	// Create order (succeeds — will need compensation)
+	// Create order (succeeds, will need compensation)
 	ctx2, order := tracer("order-service").Start(ctx, "CreateOrder",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1734,7 +1734,7 @@ func sagaCompensationFlow(ctx context.Context) {
 	dbInsert.End()
 	order.End()
 
-	// Reserve inventory (succeeds — will need compensation)
+	// Reserve inventory (succeeds, will need compensation)
 	_, reserve := tracer("inventory-service").Start(ctx, "ReserveStock",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1757,7 +1757,7 @@ func sagaCompensationFlow(ctx context.Context) {
 	sleep(15, 40)
 	fraud.End()
 
-	// Payment — Stripe call with 3 retries, all fail
+	// Payment: Stripe call with 3 retries, all fail
 	ctx3, payment := tracer("payment-service").Start(ctx, "ProcessPayment",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1888,7 +1888,7 @@ func sagaCompensationFlow(ctx context.Context) {
 			trace.WithAttributes(
 				attribute.String("messaging.system", "rabbitmq"),
 				attribute.String("messaging.destination", "saga.compensate"),
-				attribute.String("notification.type", "order_cancelled"),
+				attribute.String("notification.type", "order_canceled"),
 				attribute.String("order.id", orderID),
 			),
 		)
@@ -1897,7 +1897,7 @@ func sagaCompensationFlow(ctx context.Context) {
 			trace.WithSpanKind(trace.SpanKindClient),
 			trace.WithAttributes(
 				attribute.String("peer.service", "sendgrid"),
-				attribute.String("email.template", "order_cancelled"),
+				attribute.String("email.template", "order_canceled"),
 			),
 		)
 		sleep(25, 80)
@@ -1940,7 +1940,7 @@ func sagaCompensationFlow(ctx context.Context) {
 	}
 }
 
-// Timeout cascade — search-service is slow, gateway times out, frontend retries with cache fallback.
+// Timeout cascade: search-service is slow, gateway times out, frontend retries with cache fallback.
 // Attempt 1: web -> gw -> search (SLOW, timeout) -> gw 504
 // Attempt 2: web -> gw -> config (check feature flag) -> cache (stale hit) -> analytics
 func timeoutCascadeFlow(ctx context.Context) {
@@ -1956,7 +1956,7 @@ func timeoutCascadeFlow(ctx context.Context) {
 	defer ui.End()
 	sleep(2, 5)
 
-	// First attempt — gateway times out
+	// First attempt: gateway times out
 	_, gw1 := tracer("api-gateway").Start(ctx, "GET /api/v2/search (attempt 1/2)",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1968,7 +1968,7 @@ func timeoutCascadeFlow(ctx context.Context) {
 	)
 	sleep(5, 10)
 
-	// Search is slow — ES garbage collection or shard relocation
+	// Search is slow: ES garbage collection or shard relocation
 	_, slowSearch := tracer("search-service").Start(ctx, "Elasticsearch Query (slow)",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -1991,7 +1991,7 @@ func timeoutCascadeFlow(ctx context.Context) {
 
 	sleep(50, 200) // client retry delay
 
-	// Second attempt — circuit breaker open, serves stale cache
+	// Second attempt: circuit breaker open, serves stale cache
 	_, gw2 := tracer("api-gateway").Start(ctx, "GET /api/v2/search (attempt 2/2)",
 		trace.WithSpanKind(trace.SpanKindServer),
 		trace.WithAttributes(
@@ -2005,7 +2005,7 @@ func timeoutCascadeFlow(ctx context.Context) {
 	)
 	sleep(3, 8)
 
-	// Config check — stale cache fallback enabled?
+	// Config check: stale cache fallback enabled?
 	_, configCheck := tracer("config-service").Start(ctx, "GetFeatureFlag search.stale_cache_fallback",
 		trace.WithSpanKind(trace.SpanKindClient),
 		trace.WithAttributes(

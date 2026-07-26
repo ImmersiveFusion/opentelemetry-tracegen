@@ -1,0 +1,23 @@
+# Keep the build context small. The image build needs only the Go module and
+# sources; everything below is irrelevant to it.
+
+# VCS + CI + editor
+.git
+.github
+.claude
+.idea
+.vscode
+
+# Docs-only assets (README screenshots/gifs), not needed to build
+.img
+
+# Build output
+dist/
+tracegen
+tracegen.exe
+*.exe
+
+# Test artifacts
+coverage.txt
+*.test
+*.out

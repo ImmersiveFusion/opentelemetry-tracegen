@@ -216,7 +216,7 @@ type modelInfo struct {
 	peer     string // peer.service value
 }
 
-// Chat/completion models — mix of providers and tiers
+// Chat/completion models: mix of providers and tiers
 var chatModels = []modelInfo{
 	{"gpt-5.4", "openai", "https://api.openai.com/v1/chat/completions", "openai-api"},
 	{"gpt-5.4-mini", "openai", "https://api.openai.com/v1/chat/completions", "openai-api"},

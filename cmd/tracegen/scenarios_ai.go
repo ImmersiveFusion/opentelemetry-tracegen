@@ -227,7 +227,7 @@ func aiChatbotFlow(ctx context.Context) {
 	defer agent.End()
 	sleep(5, 15)
 
-	// Planning step — LLM decides which tools to call
+	// Planning step: LLM decides which tools to call
 	chatModel := randomChatModel()
 	planInputTokens := 200 + rand.Intn(600)
 	planOutputTokens := 50 + rand.Intn(150)
@@ -595,7 +595,7 @@ func multiStepAgentFlow(ctx context.Context) {
 		}
 		plan.End()
 
-		// Act step — execute selected tool
+		// Act step: execute selected tool
 		tool := toolRegistry[rand.Intn(len(toolRegistry))]
 		toolCtx, toolExec := toolSpan(iterCtx, tool.name, tool.desc)
 		sleep(10, 30)
@@ -656,7 +656,7 @@ func multiStepAgentFlow(ctx context.Context) {
 		}
 		toolExec.End()
 
-		// Reflect step — LLM evaluates tool results and decides next step
+		// Reflect step: LLM evaluates tool results and decides next step
 		reflectInput := 300 + i*200 + rand.Intn(400)
 		reflectOutput := 80 + rand.Intn(120)
 		totalInputTokens += reflectInput

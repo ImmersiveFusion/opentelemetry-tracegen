@@ -1,4 +1,4 @@
-module github.com/ImmersiveFusion/opentelemetry-tracegen
+module github.com/ImmersiveFusion/if-opentelemetry-tracegen
 
 go 1.25.0
 

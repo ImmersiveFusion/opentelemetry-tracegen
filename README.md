@@ -4,7 +4,7 @@ A single-binary distributed trace generator that produces realistic, topology-ri
 
 Built for testing observability platforms, load testing trace pipelines, and showcasing distributed system visualizations - for both traditional APM and LLM observability.
 
-![TraceGen traces in the DeepCube 3D player](.img/screenshot.png)
+![TraceGen traces in DeepCube's 3D player](.img/screenshot.png)
 
 ## Why This Exists
 

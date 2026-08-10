@@ -13,8 +13,8 @@ Thanks for your interest in TraceGen — a single-binary OpenTelemetry trace gen
 TraceGen is a single Go module with no runtime dependencies.
 
 ```bash
-git clone https://github.com/ImmersiveFusion/if-opentelemetry-tracegen.git
-cd if-opentelemetry-tracegen
+git clone https://github.com/ImmersiveFusion/opentelemetry-tracegen.git
+cd opentelemetry-tracegen
 go build -o tracegen ./cmd/tracegen
 ./tracegen -insecure   # send to a local collector on localhost:4317
 ```

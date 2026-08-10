@@ -4,7 +4,7 @@ A single-binary distributed trace generator that produces realistic, topology-ri
 
 Built for testing observability platforms, load testing trace pipelines, and showcasing distributed system visualizations - for both traditional APM and LLM observability.
 
-![TraceGen traces in IAPM's 3D player](.img/screenshot.png)
+![TraceGen traces in the DeepCube 3D player](.img/screenshot.png)
 
 ## Why This Exists
 
@@ -34,15 +34,17 @@ export OTEL_EXPORTER_OTLP_HEADERS="api-key=YOUR_KEY"
 tracegen -endpoint your-otlp-endpoint:443
 ```
 
-> **See it in 3D** - Send traces to [IAPM](https://immersivefusion.com) (`tracegen -endpoint otlp.iapm.app:443 -headers "api-key=YOUR_KEY"`) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://immersivefusion.com). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/if-opentelemetry-chaos-simulator-sample) at [demo.iapm.app](https://demo.iapm.app) - a fully interactive sandbox with visual failure injection.
+**Why the install path says `if-opentelemetry-tracegen`:** that is the Go module path declared in `go.mod`, and a module path is a public contract rather than a link. It keeps working for everyone who has already pinned it, so it deliberately stays as-is even though the repository is now named `opentelemetry-tracegen`. Please do not "fix" it to match the repo name.
+
+> **See it in 3D** - Send traces to [DeepCube (TM)](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 
 ## Live demo grids — see it running
 
 ![The seven demo grids streaming live, in motion](.img/tracegen.gif)
 
-Seven always-on demo grids stream live OpenTelemetry traces into IAPM's 3D player right now — a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud — multi-arch and distroless, one matrix row per grid, shipping to `otlp.iapm.app:443`.
+Seven always-on demo grids stream live OpenTelemetry traces into DeepCube's 3D player right now — a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud — multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
 
-**See them in 3D:** the full experience is the **IAPM 3D client** — install it and open a grid to walk the live traces. On mobile or can't install right now? **IAPM Web** runs the same grids in your browser at [portal.iapm.app](https://portal.iapm.app).
+**See them in 3D:** the full experience is [DeepCube](https://docs.deepcube.ai/DC/3D/), the immersive 3D client: install it and open a grid to walk the live traces. On mobile or can't install right now? [DeepCube Web](https://docs.deepcube.ai/DC/Web/) runs the same grids in your browser at [portal.deepcube.ai](https://portal.deepcube.ai).
 
 **[Where else does TraceGen run? →](WHERE-TRACEGEN-RUNS.md)** — a community board of deployments. Add yours.
 
@@ -156,7 +158,7 @@ Disable with `-no-logs` to emit traces only.
 
 ### OTel GenAI Semantic Conventions
 
-All AI scenarios emit spans following [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and matching the exact span shapes produced by [Microsoft Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/concepts/enterprise-readiness/observability/) and [Microsoft Agent Framework](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-observability).
+All AI scenarios emit spans following [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and matching the exact span shapes produced by [Microsoft Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/concepts/enterprise-readiness/observability/) and [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/agents/observability).
 
 **Span types:**
 
@@ -306,8 +308,8 @@ tracegen -endpoint otlp.example.com:443 -headers "api-key=YOUR_KEY"
 export OTEL_EXPORTER_OTLP_HEADERS="api-key=SECRET,x-team=platform"
 tracegen -endpoint otlp.example.com:443
 
-# Send to IAPM (3D trace visualization)
-tracegen -endpoint otlp.iapm.app:443 -headers "API-Key=YOUR_IAPM_KEY"
+# Send to DeepCube (3D trace visualization)
+tracegen -endpoint otlp.deepcube.ai:443 -headers "API-Key=YOUR_DEEPCUBE_KEY"
 ```
 
 ## How It Compares
@@ -339,7 +341,7 @@ tracegen -endpoint otlp.iapm.app:443 -headers "API-Key=YOUR_IAPM_KEY"
 
 Works with any OTLP gRPC-compatible backend:
 
-- [IAPM](https://immersivefusion.com) (3D visualization)
+- [DeepCube](https://deepcube.ai) (3D visualization)
 - Jaeger
 - Grafana Tempo
 - Honeycomb
@@ -357,13 +359,13 @@ The AI agentic traces are also compatible with LLM-specialized observability too
 
 ## Related Tools
 
-- **[OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/if-opentelemetry-chaos-simulator-sample)** - Interactive chaos engineering sandbox with visual failure injection. Complements tracegen: generate topology-rich traces here, inject chaos there, [visualize both in 3D](https://demo.iapm.app).
+- **[OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim)** - Interactive chaos engineering sandbox with visual failure injection. Complements tracegen: generate topology-rich traces here, inject chaos there, [visualize both in 3D](https://chaos.deepcube.ai).
 
 ## Building From Source
 
 ```bash
-git clone https://github.com/ImmersiveFusion/if-opentelemetry-tracegen.git
-cd if-opentelemetry-tracegen
+git clone https://github.com/ImmersiveFusion/opentelemetry-tracegen.git
+cd opentelemetry-tracegen
 go build -o tracegen ./cmd/tracegen
 ```
 
@@ -404,7 +406,7 @@ The [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semcon
 | [OTel GenAI Agent Spans](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/) | Agent span conventions: invoke_agent, execute_tool |
 | [OTel GenAI Attribute Registry](https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/) | Complete `gen_ai.*` attribute list with types |
 | [MS Semantic Kernel Observability](https://learn.microsoft.com/en-us/semantic-kernel/concepts/enterprise-readiness/observability/) | Activity sources, metrics, `gen_ai` attribute usage |
-| [MS Agent Framework Observability](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-observability) | Production span shapes: `invoke_agent`, `chat`, `execute_tool` |
+| [MS Agent Framework Observability](https://learn.microsoft.com/en-us/agent-framework/agents/observability) | Production span shapes: `invoke_agent`, `chat`, `execute_tool` |
 | LLM Observability Market Research (internal) | Market gap analysis, competitive positioning, feature parity requirements |
 | [Langfuse OTel Integration](https://langfuse.com/integrations/native/opentelemetry) | OTel-native SDK v3, attribute expectations |
 | [Traceloop OpenLLMetry](https://github.com/traceloop/openllmetry) | OTel GenAI conventions adopted into official spec |
@@ -420,7 +422,7 @@ The [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semcon
 [YouTube](https://www.youtube.com/@immersivefusion) |
 [Twitch](https://www.twitch.tv/immersivefusion)
 
-[Try IAPM](https://immersivefusion.com/landing/default) for your own projects.
+[Try DeepCube](https://deepcube.ai) for your own projects.
 
 ## License
 

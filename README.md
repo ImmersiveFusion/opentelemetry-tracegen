@@ -34,7 +34,7 @@ export OTEL_EXPORTER_OTLP_HEADERS="api-key=YOUR_KEY"
 tracegen -endpoint your-otlp-endpoint:443
 ```
 
-**Installed from the old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on the old path stops resolving from v0.8.0 onward, so update your command to the path above.
+**Installed from the old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on the old path stops resolving from v0.7.8 onward, so update your command to the path above.
 
 > **See it in 3D** - Send traces to [DeepCube (TM)](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 

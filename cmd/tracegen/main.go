@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ImmersiveFusion/if-opentelemetry-tracegen/internal/health"
+	"github.com/ImmersiveFusion/opentelemetry-tracegen/internal/health"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"

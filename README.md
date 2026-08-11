@@ -21,7 +21,7 @@ This tool generates **topology-rich, failure-injectable traces from a single bin
 
 ```bash
 # Download the latest release (or build from source)
-go install github.com/ImmersiveFusion/if-opentelemetry-tracegen/cmd/tracegen@latest
+go install github.com/ImmersiveFusion/opentelemetry-tracegen/cmd/tracegen@latest
 
 # Send to a local OTLP collector (Jaeger, Tempo, etc.)
 tracegen -insecure
@@ -34,7 +34,7 @@ export OTEL_EXPORTER_OTLP_HEADERS="api-key=YOUR_KEY"
 tracegen -endpoint your-otlp-endpoint:443
 ```
 
-**Why the install path says `if-opentelemetry-tracegen`:** that is the Go module path declared in `go.mod`, and a module path is a public contract rather than a link. It keeps working for everyone who has already pinned it, so it deliberately stays as-is even though the repository is now named `opentelemetry-tracegen`. Please do not "fix" it to match the repo name.
+**Installed from the old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on the old path stops resolving from v0.8.0 onward, so update your command to the path above.
 
 > **See it in 3D** - Send traces to [DeepCube (TM)](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 

@@ -22,7 +22,7 @@ What you expected, and what actually happened.
 - TraceGen version / tag or digest:
 - OS + architecture (e.g. `linux/arm64`):
 - Run mode: binary or container (`immersivefusion/tracegen`):
-- OTLP backend (Jaeger, Tempo, IAPM, …):
+- OTLP backend (Jaeger, Tempo, DeepCube, …):
 
 **Logs / output**
 Relevant output (run with `-log-level debug` for more detail).

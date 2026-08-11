@@ -49,7 +49,7 @@ Existing trace generators are either flat span emitters (no service topology) or
 
 ## See it move
 
-The traces are real, and you can watch them flow. TraceGen feeds live demo grids that stream OpenTelemetry traces into [IAPM](https://immersivefusion.com)'s 3D player. Watch them live on Twitch: [twitch.tv/immersivefusion](https://www.twitch.tv/immersivefusion)
+The traces are real, and you can watch them flow. TraceGen feeds live demo grids that stream OpenTelemetry traces into [DeepCube (TM)](https://deepcube.ai)'s 3D player. Watch them live on Twitch: [twitch.tv/immersivefusion](https://www.twitch.tv/immersivefusion)
 
 ## Tags
 
@@ -57,6 +57,6 @@ The traces are real, and you can watch them flow. TraceGen feeds live demo grids
 
 ## Source, issues, full docs
 
-[github.com/ImmersiveFusion/if-opentelemetry-tracegen](https://github.com/ImmersiveFusion/if-opentelemetry-tracegen)
+[github.com/ImmersiveFusion/opentelemetry-tracegen](https://github.com/ImmersiveFusion/opentelemetry-tracegen)
 
 Apache-2.0. Built by Immersive Fusion.

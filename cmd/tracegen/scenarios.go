@@ -1888,7 +1888,7 @@ func sagaCompensationFlow(ctx context.Context) {
 			trace.WithAttributes(
 				attribute.String("messaging.system", "rabbitmq"),
 				attribute.String("messaging.destination", "saga.compensate"),
-				attribute.String("notification.type", "order_cancelled"),
+				attribute.String("notification.type", "order_canceled"),
 				attribute.String("order.id", orderID),
 			),
 		)
@@ -1897,7 +1897,7 @@ func sagaCompensationFlow(ctx context.Context) {
 			trace.WithSpanKind(trace.SpanKindClient),
 			trace.WithAttributes(
 				attribute.String("peer.service", "sendgrid"),
-				attribute.String("email.template", "order_cancelled"),
+				attribute.String("email.template", "order_canceled"),
 			),
 		)
 		sleep(25, 80)

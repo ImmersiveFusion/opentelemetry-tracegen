@@ -186,8 +186,10 @@ func randomOrderID() string {
 }
 
 func randomSearchTerm() string {
-	terms := []string{"widget", "dashboard", "monitor", "alert rules", "trace analysis", "service health",
-		"wireless keyboard", "USB-C hub", "laptop stand", "noise cancelling headphones", "ergonomic mouse"}
+	terms := []string{
+		"widget", "dashboard", "monitor", "alert rules", "trace analysis", "service health",
+		"wireless keyboard", "USB-C hub", "laptop stand", "noise canceling headphones", "ergonomic mouse",
+	}
 	return terms[rand.Intn(len(terms))]
 }
 
@@ -200,7 +202,7 @@ func randomHex(n int) string {
 	if _, err := cryptorand.Read(b); err != nil {
 		// Fallback to math/rand if crypto/rand fails
 		for i := range b {
-			b[i] = byte(rand.Intn(256))
+			b[i] = byte(rand.Intn(256)) //nolint:gosec // G115: rand.Intn(256) is always in [0,255]
 		}
 	}
 	return hex.EncodeToString(b)[:n]
@@ -243,9 +245,9 @@ var embeddingModels = []modelInfo{
 	{"Cohere-rerank-v4.0-pro", "cohere", "https://api.cohere.com/v2/embed", "cohere-api"},
 }
 
-func randomChatModel() modelInfo       { return chatModels[rand.Intn(len(chatModels))] }
-func randomLightChatModel() modelInfo  { return lightChatModels[rand.Intn(len(lightChatModels))] }
-func randomEmbeddingModel() modelInfo  { return embeddingModels[rand.Intn(len(embeddingModels))] }
+func randomChatModel() modelInfo      { return chatModels[rand.Intn(len(chatModels))] }
+func randomLightChatModel() modelInfo { return lightChatModels[rand.Intn(len(lightChatModels))] }
+func randomEmbeddingModel() modelInfo { return embeddingModels[rand.Intn(len(embeddingModels))] }
 
 // ─── GenAI Helper Functions ───────────────────────────────────────────────────
 // These produce spans matching Microsoft Semantic Kernel / Agent Framework OTel

@@ -1,6 +1,6 @@
 # OpenTelemetry Trace Generator
 
-A single-binary distributed trace generator that produces realistic, topology-rich OTLP traces and correlated logs. No Docker Compose, no microservices to deploy, no infrastructure - just one executable (or a 5.7 MB container) that simulates a full e-commerce platform with up to 28 services, dozens of pods that scale with the topology, and 40 scenario flows - including AI agentic scenarios with full OTel GenAI semantic conventions. Three complexity levels (light/normal/heavy) let you scale from a clean 10-service demo to the full topology with AI.
+A single-binary distributed trace generator that produces realistic, topology-rich OTLP traces, correlated logs, and metrics derived from those same traces. No Docker Compose, no microservices to deploy, no infrastructure - just one executable (or a 5.7 MB container) that simulates a full e-commerce platform with up to 28 services, dozens of pods that scale with the topology, and 40 scenario flows - including AI agentic scenarios with full OTel GenAI semantic conventions. Three complexity levels (light/normal/heavy) let you scale from a clean 10-service demo to the full topology with AI.
 
 Built for testing observability platforms, load testing trace pipelines, and showcasing distributed system visualizations - for both traditional APM and LLM observability.
 
@@ -42,7 +42,7 @@ tracegen -endpoint your-otlp-endpoint:443
 
 ![The seven demo grids streaming live, in motion](.img/tracegen.gif)
 
-Seven always-on demo grids stream live OpenTelemetry traces into DeepCube's 3D player right now: a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud, multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
+Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics into DeepCube's 3D player right now: a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud, multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
 
 **See them in 3D:** the full experience is [DeepCube](https://docs.deepcube.ai/DC/3D/), the immersive 3D client: install it and open a grid to walk the live traces. On mobile or can't install right now? [DeepCube Web](https://docs.deepcube.ai/DC/Web/) runs the same grids in your browser at [portal.deepcube.ai](https://portal.deepcube.ai).
 

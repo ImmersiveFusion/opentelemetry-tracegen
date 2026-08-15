@@ -48,6 +48,8 @@ tracegen -endpoint your-otlp-endpoint:443
 
 Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics into DeepCube's 3D player right now: a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud, multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
 
+**Just want to look?** The grids are streamed live on Twitch at [twitch.tv/deepcubelive](https://www.twitch.tv/deepcubelive), around the clock. No account, no install, nothing to sign up for. It is running whether or not you do anything, which is the easiest way to see what this generator's output actually looks like at the other end.
+
 **See them in 3D:** the full experience is [DeepCube](https://docs.deepcube.ai/DC/3D/), the immersive 3D client: install it and open a grid to walk the live traces. On mobile or can't install right now? [DeepCube Web](https://docs.deepcube.ai/DC/Web/) runs the same grids in your browser at [portal.deepcube.ai](https://portal.deepcube.ai).
 
 **[Where else does TraceGen run?](WHERE-TRACEGEN-RUNS.md)**: a community board of deployments. Add yours.

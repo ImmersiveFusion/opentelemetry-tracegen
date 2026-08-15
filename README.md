@@ -2,7 +2,11 @@
 
 A single-binary distributed trace generator that produces realistic, topology-rich OTLP traces, correlated logs, and metrics derived from those same traces. No Docker Compose, no microservices to deploy, no infrastructure - just one executable (or a 5.7 MB container) that simulates a full e-commerce platform with up to 28 services, dozens of pods that scale with the topology, and 40 scenario flows - including AI agentic scenarios with full OTel GenAI semantic conventions. Three complexity levels (light/normal/heavy) let you scale from a clean 10-service demo to the full topology with AI.
 
-Built for testing observability platforms, load testing trace pipelines, and showcasing distributed system visualizations - for both traditional APM and LLM observability.
+**A public good for the OpenTelemetry community.** Apache-2.0, no account, no sign-up, no lock-in. The output is plain OTLP, so it works in whatever you already run: Jaeger, Tempo, Grafana, an OpenTelemetry Collector, or spatial tools such as DeepCube. Use it to test an observability platform, load test a trace pipeline, or show a distributed system to someone who has never seen one, for both traditional APM and LLM observability.
+
+Most trace generators die. Their repos go quiet, the SDKs move, and the thing stops building. This one is maintained, and that is the point of it.
+
+**It has a sibling.** tracegen makes realistic telemetry out of nothing: **synthetic** OTel. [sos-beacon](https://github.com/ImmersiveFusion/sos-beacon) is the **organic** counterpart, a real workload doing a real job that emits real telemetry as a byproduct. Between them you can fill a backend with either kind.
 
 ![TraceGen traces in DeepCube's 3D player](.img/screenshot.png)
 
@@ -36,7 +40,7 @@ tracegen -endpoint your-otlp-endpoint:443
 
 **Installed from the old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on the old path stops resolving from v0.7.8 onward, so update your command to the path above.
 
-> **See it in 3D** - Send traces to [DeepCube (TM)](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
+> **See it in 3D** - Send traces to [DeepCube](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 
 ## Live demo grids: see it running
 
@@ -373,15 +377,17 @@ tracegen -endpoint otlp.deepcube.ai:443 -headers "API-Key=YOUR_DEEPCUBE_KEY"
 
 Works with any OTLP gRPC-compatible backend:
 
-- [DeepCube](https://deepcube.ai) (3D visualization)
-- Jaeger
+- Any OpenTelemetry Collector
+- Datadog (with OTLP endpoint)
+- DeepCube (3D visualization)
+- Elastic APM
 - Grafana Tempo
 - Honeycomb
+- Jaeger
 - New Relic
-- Datadog (with OTLP endpoint)
 - Splunk Observability
-- Elastic APM
-- Any OpenTelemetry Collector
+
+Listed alphabetically on purpose. DeepCube is one consumer of this tool among many, and the tool is not built to favour it.
 
 The AI agentic traces are also compatible with LLM-specialized observability tools that accept OTel input:
 
@@ -391,6 +397,9 @@ The AI agentic traces are also compatible with LLM-specialized observability too
 
 ## Related Tools
 
+Part of a small family of single-binary, zero-infra OTel tools, all Apache-2.0 and all usable without any Immersive Fusion account:
+
+- **[sos-beacon](https://github.com/ImmersiveFusion/sos-beacon)** - The **organic** counterpart to this tool's synthetic output. A real workload doing a real job (surfacing people asking for help in public forums, for a human to answer), OTel-instrumented, so it emits genuine production telemetry as a byproduct. Where tracegen invents a system, sos-beacon *is* one.
 - **[OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim)** - Interactive chaos engineering sandbox with visual failure injection. Complements tracegen: generate topology-rich traces here, inject chaos there, [visualize both in 3D](https://chaos.deepcube.ai).
 
 ## Building From Source
@@ -453,8 +462,6 @@ The [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semcon
 [Twitter/X](https://twitter.com/immersivefusion) |
 [YouTube](https://www.youtube.com/@immersivefusion) |
 [Twitch](https://www.twitch.tv/immersivefusion)
-
-[Try DeepCube](https://deepcube.ai) for your own projects.
 
 ## License
 

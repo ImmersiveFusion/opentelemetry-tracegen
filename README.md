@@ -156,6 +156,33 @@ Every service emits OTel log records via OTLP alongside traces. Logs are automat
 
 Disable with `-no-logs` to emit traces only.
 
+### Metrics
+
+Every service emits OTel metrics via OTLP alongside traces and logs. They are **derived from the spans the scenarios already produce**, so metrics and traces agree by construction: the p99 in a histogram is the same span you can click into.
+
+Metrics aggregate in process and flush on an interval, so unlike traces their volume is decoupled from `-level`. A `-level 10` run emits roughly 350 traces/second and the *same* metric load as `-level 1`.
+
+| Metric | Type | What it shows |
+|---|---|---|
+| `http.server.request.duration` | Histogram (s) | RED metrics per route, method and status. Semconv names, seconds, spec bucket boundaries |
+| `http.server.active_requests` | UpDownCounter | In-flight requests, rising and falling with real scenario concurrency |
+| `system.cpu.utilization` | Gauge | Driven by each service's actual span volume, not a random walk |
+| `system.memory.usage` | Gauge | Resident memory, drifting with load |
+| `db.client.connection.count` | UpDownCounter | Pool occupancy split `used`/`idle`, tracking real database spans |
+| `tracegen.messaging.queue.depth` | Gauge | Published minus consumed, per destination |
+| `gen_ai.client.token.usage` | Histogram | Input and output tokens by model, system and operation |
+| `gen_ai.client.operation.duration` | Histogram (s) | LLM call latency |
+
+**The queue depth is the one to watch.** Producer spans increment it and consumer spans decrement it, so running with `-no-consumers` makes the backlog climb without bound while the trace graph still looks busy. That is a story traces alone can only imply.
+
+**Naming.** Where OpenTelemetry defines a metric, TraceGen uses its name and conforms to its contract, including seconds as the unit. Everything else lives under a `tracegen.` prefix rather than extending a semconv namespace.
+
+**Cardinality.** `service.instance.id` is deliberately **off** by default: it multiplies every series by the pod count (up to 59 at `-complexity heavy`), and metric backends commonly bill per active series with no cardinality control on an OTLP push path. Turn it on with `-metrics-instance-id` when per-pod resolution is the thing you are demonstrating. Metric attributes are an explicit allowlist, never a copy of the span's attributes, so user, session and order ids never reach a metric.
+
+**Temporality.** `-metrics-temporality delta` switches from the default cumulative. Prometheus-backed stores are cumulative-native, while some OTLP ingest paths ask producers for delta, and which behavior a given endpoint implements is often undocumented. A producer that can emit either shape on demand is the cheapest way to settle that by experiment.
+
+Disable with `-no-metrics` to emit traces and logs only.
+
 ### OTel GenAI Semantic Conventions
 
 All AI scenarios emit spans following [OTel GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) and matching the exact span shapes produced by [Microsoft Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/concepts/enterprise-readiness/observability/) and [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/agents/observability).
@@ -235,6 +262,11 @@ Flags:
   -no-ai-backends      Disable LLM/AI backends (AI spans emit errors)
   -ai-only             Only run AI agentic scenarios
   -no-logs             Disable OTel log record emission (traces only)
+  -no-metrics          Disable OTel metric emission
+  -metrics-interval    Metric export interval (default 15s)
+  -metrics-temporality Metric aggregation temporality: cumulative or delta (default cumulative)
+  -metrics-instance-id Add service.instance.id to metrics (per-pod resolution; multiplies series count)
+  -metrics-verify      Emit tracegen.spans.emitted, the emission oracle
   -insecure            Use plaintext gRPC (no TLS) for local backends
   -log-level string    Console verbosity: silent, error, info, debug (default "info")
   -quiet               Errors only (alias for -log-level=error); silences the periodic "traces sent" heartbeat

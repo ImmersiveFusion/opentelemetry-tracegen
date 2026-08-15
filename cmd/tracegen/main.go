@@ -86,7 +86,7 @@ func emitLog(ctx context.Context, svc string, severity logapi.Severity, body str
 // parsed headers shared by all providers
 var otlpHeaders map[string]string
 
-func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostName string) *sdktrace.TracerProvider {
+func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostName, metricKey string) *sdktrace.TracerProvider {
 	opts := []otlptracegrpc.Option{
 		otlptracegrpc.WithEndpoint(endpoint),
 	}
@@ -103,7 +103,7 @@ func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostNam
 		fatal("failed to create trace exporter", "service", serviceName, "err", err)
 	}
 
-	tp := sdktrace.NewTracerProvider(
+	tpOpts := []sdktrace.TracerProviderOption{
 		sdktrace.WithSyncer(exporter),
 		sdktrace.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
@@ -111,7 +111,16 @@ func newProvider(ctx context.Context, serviceName, endpoint, instanceID, hostNam
 			attribute.String("service.instance.id", instanceID),
 			attribute.String("host.name", hostName),
 		)),
-	)
+	}
+	// Metrics are derived from the spans this provider produces rather than
+	// hand-instrumented at the ~200 scenario call sites. That keeps traces and
+	// metrics consistent by construction: the p99 in the histogram is the same
+	// span you can click into.
+	if !metricsDisabled {
+		tpOpts = append(tpOpts, sdktrace.WithSpanProcessor(metricSpanProcessor{key: metricKey}))
+	}
+
+	tp := sdktrace.NewTracerProvider(tpOpts...)
 	tracerPool[serviceName] = append(tracerPool[serviceName], tp.Tracer(serviceName))
 	providers = append(providers, tp)
 
@@ -254,6 +263,11 @@ func main() {
 	aiOnlyFlag := flag.Bool("ai-only", false, "only run AI agentic scenarios")
 	complexityFlag := flag.String("complexity", "normal", "topology complexity: light, normal, heavy")
 	noLogsFlag := flag.Bool("no-logs", false, "disable OTel log record emission (traces only)")
+	noMetricsFlag := flag.Bool("no-metrics", false, "disable OTel metric emission")
+	metricsIntervalFlag := flag.Duration("metrics-interval", 15*time.Second, "metric export interval")
+	metricsTemporalityFlag := flag.String("metrics-temporality", "cumulative", "metric aggregation temporality: cumulative or delta")
+	metricsInstanceIDFlag := flag.Bool("metrics-instance-id", false, "add service.instance.id to metrics (per-pod resolution; multiplies series count by pod count)")
+	metricsVerifyFlag := flag.Bool("metrics-verify", false, "emit tracegen.spans.emitted, the emission oracle for diffing against what a pipeline counted")
 	logLevelFlag := flag.String("log-level", "", "console verbosity: silent, error, info, debug (default info; env TRACEGEN_LOG_LEVEL)")
 	quietFlag := flag.Bool("quiet", false, "errors only: suppress the periodic 'traces sent' heartbeat (alias for -log-level=error); the startup banner and errors always print")
 	healthAddrFlag := flag.String("health-addr", ":8080", "address for the /readyz and /healthz HTTP endpoints; empty disables")
@@ -266,8 +280,23 @@ func main() {
 	aiOnly = *aiOnlyFlag
 	complexity = *complexityFlag
 	logsDisabled = *noLogsFlag
+	metricsDisabled = *noMetricsFlag
+	metricsInterval = *metricsIntervalFlag
+	metricsInstanceID = *metricsInstanceIDFlag
+	metricsVerify = *metricsVerifyFlag
 	if complexity != "light" && complexity != "normal" && complexity != "heavy" {
 		fatal("invalid -complexity, must be light, normal, or heavy", "value", complexity)
+	}
+	switch strings.ToLower(strings.TrimSpace(*metricsTemporalityFlag)) {
+	case "cumulative":
+		metricsDelta = false
+	case "delta":
+		metricsDelta = true
+	default:
+		fatal("invalid -metrics-temporality, must be cumulative or delta", "value", *metricsTemporalityFlag)
+	}
+	if metricsInterval < time.Second {
+		fatal("invalid -metrics-interval, must be at least 1s", "value", metricsInterval.String())
 	}
 
 	endpoint := *endpointFlag
@@ -397,7 +426,18 @@ func main() {
 	}
 
 	for _, p := range pods {
-		newProvider(ctx, p.svc, endpoint, p.id, p.node)
+		// Metric identity is the service by default, the pod only when
+		// -metrics-instance-id is set. The resource is what fixes series
+		// identity, so a per-pod meter provider would carry service.instance.id
+		// into every series whether or not anyone wanted per-pod resolution.
+		metricKey := p.svc
+		if metricsInstanceID {
+			metricKey = p.svc + "/" + p.id
+		}
+		if !metricsDisabled && metricsForKey(metricKey) == nil {
+			newMeterProvider(ctx, metricKey, p.svc, p.id, p.node, endpoint)
+		}
+		newProvider(ctx, p.svc, endpoint, p.id, p.node, metricKey)
 	}
 	defer func() {
 		for _, tp := range providers {
@@ -406,6 +446,9 @@ func main() {
 		for _, lp := range logProviders {
 			_ = lp.Shutdown(context.Background())
 		}
+		// Metrics aggregate in memory between flushes, so without this the final
+		// interval is simply lost on shutdown.
+		shutdownMeterProviders()
 	}()
 
 	ticker := time.NewTicker(time.Duration(cfg.tickMs) * time.Millisecond)
@@ -487,6 +530,21 @@ func main() {
 	}
 	if noAIBackends {
 		bannerln("Mode: No AI backends (AI services excluded)")
+	}
+	if metricsDisabled {
+		bannerln("Metrics: disabled")
+	} else {
+		temporality := "cumulative"
+		if metricsDelta {
+			temporality = "delta"
+		}
+		scope := "per service"
+		if metricsInstanceID {
+			scope = "per pod (service.instance.id on)"
+		}
+		bannerf("Metrics: every %s, %s, %s%s\n",
+			metricsInterval, temporality, scope,
+			map[bool]string{true: ", +emission oracle", false: ""}[metricsVerify])
 	}
 	if len(scenarios) == 0 {
 		fatal("no scenarios available with current flags")

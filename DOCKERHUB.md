@@ -20,7 +20,7 @@ docker run --rm immersivefusion/snowglobe -insecure -endpoint host.docker.intern
 
 The image is multi-arch (`linux/amd64`, `linux/arm64`), distroless, and runs as non-root.
 
-**Previously `immersivefusion/tracegen`.** That name still works and still receives every release, so existing commands and pinned tags keep running. New usage should prefer `immersivefusion/snowglobe`.
+**Previously `immersivefusion/tracegen`.** That repository is archived and no longer receives releases. Its existing tags stay pullable, so pinned commands keep running, but anything tracking `latest` should move to `immersivefusion/snowglobe`.
 
 ## Three things to try
 

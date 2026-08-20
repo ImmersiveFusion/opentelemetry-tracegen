@@ -1,10 +1,10 @@
 # Container image for TraceGen (the OTLP trace generator).
 # Multi-stage: build the static Go binary, then ship it on a distroless base.
-# Built + pushed to Docker Hub (immersivefusion/tracegen) by .github/workflows/release.yml
+# Built + pushed to Docker Hub (immersivefusion/snowglobe) by .github/workflows/release.yml
 # on a version-tag push. Multi-arch via buildx (TARGETOS/TARGETARCH).
 #
 # Usage on a cluster (the binary takes the same flags as the CLI):
-#   docker run --rm immersivefusion/tracegen -endpoint <collector:4317> -insecure ...
+#   docker run --rm immersivefusion/snowglobe -endpoint <collector:4317> -insecure ...
 # syntax=docker/dockerfile:1
 
 FROM golang:1.25-bookworm AS build

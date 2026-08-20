@@ -21,7 +21,7 @@ What you expected, and what actually happened.
 **Environment**
 - TraceGen version / tag or digest:
 - OS + architecture (e.g. `linux/arm64`):
-- Run mode: binary or container (`immersivefusion/tracegen`):
+- Run mode: binary or container (`immersivefusion/snowglobe`):
 - OTLP backend (Jaeger, Tempo, DeepCube, …):
 
 **Logs / output**

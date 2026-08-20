@@ -65,7 +65,9 @@ jobs:
           files: tracegen-*
           generate_release_notes: true
 
-  # Build + push the multi-arch container image to Docker Hub (immersivefusion/tracegen).
+  # Build + push the multi-arch container image to Docker Hub. Published to BOTH
+  # immersivefusion/snowglobe (canonical) and immersivefusion/tracegen (legacy alias),
+  # identical manifests, so existing `docker run immersivefusion/tracegen` keeps working.
   # Runs on the same version-tag trigger as the binaries above. Independent of `build`.
   # Requires repo secret: DOCKERHUB_TOKEN (username is the public namespace, hardcoded below).
   docker:
@@ -89,7 +91,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: immersivefusion/tracegen
+          images: |
+            immersivefusion/snowglobe
+            immersivefusion/tracegen
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest

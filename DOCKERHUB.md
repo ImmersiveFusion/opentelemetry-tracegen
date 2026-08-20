@@ -1,6 +1,6 @@
 <!-- Canonical source for the Docker Hub Overview. Pasted into the Hub page by hand
      (the description API rejects PATs). When you change this, re-paste it on Docker Hub. -->
-# TraceGen
+# Snowglobe
 
 **One container that emits realistic, topology-rich OpenTelemetry traces, logs and metrics, including AI agentic spans.** No microservices to deploy, no Docker Compose with 15 containers. A single 5.7 MB image simulates a full e-commerce platform: up to 28 services, dozens of pods that scale with the topology, 40 scenario flows, and 10 injectable failure modes, with full OTel GenAI semantic conventions for LLM/agent observability.
 
@@ -12,13 +12,15 @@ Point it at any OTLP/gRPC collector (Jaeger, Tempo, Grafana, an OTel Collector, 
 
 ```bash
 # Traces to a collector on your host
-docker run --rm immersivefusion/tracegen -insecure -endpoint host.docker.internal:4317
+docker run --rm immersivefusion/snowglobe -insecure -endpoint host.docker.internal:4317
 
 # Crank up the volume and inject failures
-docker run --rm immersivefusion/tracegen -insecure -endpoint host.docker.internal:4317 -level 8 -errors 5
+docker run --rm immersivefusion/snowglobe -insecure -endpoint host.docker.internal:4317 -level 8 -errors 5
 ```
 
 The image is multi-arch (`linux/amd64`, `linux/arm64`), distroless, and runs as non-root.
+
+**Previously `immersivefusion/tracegen`.** That name still works and still receives every release, so existing commands and pinned tags keep running. New usage should prefer `immersivefusion/snowglobe`.
 
 ## Three things to try
 

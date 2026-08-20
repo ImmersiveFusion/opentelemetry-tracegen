@@ -47,11 +47,11 @@ The image is multi-arch (`linux/amd64`, `linux/arm64`), distroless, and runs as 
 
 ## Why it exists
 
-Existing trace generators are either flat span emitters (no service topology) or full demo apps that need Docker Compose and several GB of RAM, and none of them generate AI agentic traces. TraceGen produces topology-rich, failure-injectable traces from a single binary, covering both traditional microservice flows and AI agentic patterns. One image proves a platform can visualize both.
+Existing trace generators are either flat span emitters (no service topology) or full demo apps that need Docker Compose and several GB of RAM, and none of them generate AI agentic traces. Snowglobe produces topology-rich, failure-injectable traces from a single binary, covering both traditional microservice flows and AI agentic patterns. One image proves a platform can visualize both.
 
 ## See it move
 
-The traces are real, and you can watch them flow. TraceGen feeds live demo grids that stream OpenTelemetry traces into [DeepCube (TM)](https://deepcube.ai)'s 3D player. Watch them live on Twitch: [twitch.tv/immersivefusion](https://www.twitch.tv/immersivefusion)
+The traces are real, and you can watch them flow. Snowglobe feeds live demo grids that stream OpenTelemetry traces into [DeepCube (TM)](https://deepcube.ai)'s 3D player. Watch them live on Twitch: [twitch.tv/immersivefusion](https://www.twitch.tv/immersivefusion)
 
 ## Tags
 

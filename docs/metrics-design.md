@@ -2,7 +2,7 @@
 
 Status: **implemented**. See `cmd/snowglobe/metrics.go`.
 
-This document covers what tracegen emits as OTLP metrics, why, and the constraints that shape it.
+This document covers what Snowglobe emits as OTLP metrics, why, and the constraints that shape it.
 
 ## What changed between design and implementation
 
@@ -20,7 +20,7 @@ unbounded backlog rather than a simulated one, and it costs less code than a ran
 the same span processor derives the metrics. The net result is that all four layers are implemented
 with **zero edits to the ~3,000 lines of scenario code**.
 
-One item from the plan was dropped: cache hit ratio. Tracegen's cache spans do not distinguish a hit
+One item from the plan was dropped: cache hit ratio. Snowglobe's cache spans do not distinguish a hit
 from a miss, so a counter pair would have been invented rather than derived. It needs a span attribute
 first.
 
@@ -47,7 +47,7 @@ and flush on an interval via a `PeriodicReader`. A `-level 10` run produces roug
 but the **same** metric volume as `-level 1`.
 
 That is a feature. It means the metrics load is predictable and decoupled from the trace load, so a
-metrics-enabled tracegen does not multiply the cost of a high-rate demo grid. It also means metric
+metrics-enabled Snowglobe does not multiply the cost of a high-rate demo grid. It also means metric
 volume is governed almost entirely by **series count**, which is why the cardinality budget below is
 the binding constraint rather than the tick rate.
 
@@ -124,14 +124,14 @@ on the trace side.
 | `gen_ai.client.operation.duration` | Histogram | `s` | Same, plus `error.type` where applicable |
 
 Token counts already exist as `gen_ai.usage.input_tokens` / `output_tokens` span attributes, so this is
-a projection of data tracegen already produces rather than new simulation. Cardinality is naturally
+a projection of data Snowglobe already produces rather than new simulation. Cardinality is naturally
 small: 9 chat models across 5 systems and 4 operations.
 
 ---
 
 ## Layer 3: an emission oracle, off by default
 
-Tracegen occupies a position no real producer does: it knows the correct answer. When a scenario runs,
+Snowglobe occupies a position no real producer does: it knows the correct answer. When a scenario runs,
 it knows exactly how many spans it created, for which service, with which outcome.
 
 A `tracegen.spans.emitted` counter, incremented in a `SpanProcessor.OnEnd` hook, makes that knowledge
@@ -140,7 +140,7 @@ queryable. Diffing it against whatever the receiving pipeline reports answers on
 
 That is a delivery-integrity check, not a duplicate RED metric. Because it compares **totals** rather
 than histogram shapes, it needs no bucket-for-bucket alignment with anything downstream, which keeps
-tracegen fully conformant while still serving as the oracle.
+Snowglobe fully conformant while still serving as the oracle.
 
 Gated behind `-metrics-verify`, default off. An oracle nobody queries is just cardinality.
 
@@ -174,7 +174,7 @@ pods     x routes x methods x statuses    (instance id on)
 
 At `-complexity heavy` that is 28 services or 59 pods against the same per-service dimensions, so
 enabling `service.instance.id` multiplies the RED series count by roughly the average pod-per-service
-count. Against a real deployment where a service commonly has one or two instances, tracegen would be an
+count. Against a real deployment where a service commonly has one or two instances, Snowglobe would be an
 outlier by an order of magnitude, across however many grids are running.
 
 Therefore:

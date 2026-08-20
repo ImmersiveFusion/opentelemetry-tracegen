@@ -1,3 +1,5 @@
+![A sealed glass dome enclosing a glowing city of services, three ribbons of light rising through it](.img/banner.jpg)
+
 # Snowglobe
 
 **A sealed world you can shake.**

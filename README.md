@@ -54,7 +54,7 @@ snowglobe -endpoint your-otlp-endpoint:443
 
 ## Live demo grids: see it running
 
-![The seven demo grids streaming live, in motion](.img/snowglobe.gif)
+![The seven demo grids streaming live into DeepCube's 3D player](.img/deepcube.gif)
 
 Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics into DeepCube's 3D player right now: a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud, multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
 

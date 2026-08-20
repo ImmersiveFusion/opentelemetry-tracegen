@@ -25,22 +25,22 @@ This tool generates **topology-rich, failure-injectable traces from a single bin
 
 ```bash
 # Download the latest release (or build from source)
-go install github.com/ImmersiveFusion/opentelemetry-tracegen/cmd/tracegen@latest
+go install github.com/ImmersiveFusion/snowglobe/cmd/snowglobe@latest
 
 # Send to a local OTLP collector (Jaeger, Tempo, etc.)
-tracegen -insecure
+snowglobe -insecure
 
 # Send to a remote endpoint with auth headers
-tracegen -endpoint your-otlp-endpoint:443 -headers "api-key=YOUR_KEY"
+snowglobe -endpoint your-otlp-endpoint:443 -headers "api-key=YOUR_KEY"
 
 # Or set headers via the standard OTel environment variable
 export OTEL_EXPORTER_OTLP_HEADERS="api-key=YOUR_KEY"
-tracegen -endpoint your-otlp-endpoint:443
+snowglobe -endpoint your-otlp-endpoint:443
 ```
 
-**Installed from the old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on the old path stops resolving from v0.7.8 onward, so update your command to the path above.
+**Installed from an old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`, and releases up to v0.8.0 as `github.com/ImmersiveFusion/opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on either old path stops resolving from the next release onward, so update your command to the path above. The installed binary is now named `snowglobe` rather than `tracegen`.
 
-> **See it in 3D** - Send traces to [DeepCube](https://deepcube.ai) (`tracegen -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
+> **See it in 3D** - Send traces to [DeepCube](https://deepcube.ai) (`snowglobe -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 
 ## Live demo grids: see it running
 
@@ -52,7 +52,7 @@ Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics in
 
 **See them in 3D:** the full experience is [DeepCube](https://docs.deepcube.ai/DC/3D/), the immersive 3D client: install it and open a grid to walk the live traces. On mobile or can't install right now? [DeepCube Web](https://docs.deepcube.ai/DC/Web/) runs the same grids in your browser at [portal.deepcube.ai](https://portal.deepcube.ai).
 
-**[Where else does TraceGen run?](WHERE-TRACEGEN-RUNS.md)**: a community board of deployments. Add yours.
+**[Where else does TraceGen run?](WHERE-SNOWGLOBE-RUNS.md)**: a community board of deployments. Add yours.
 
 ## Features
 
@@ -313,41 +313,41 @@ Flags:
 
 ```bash
 # Send to a local Jaeger/Tempo/Collector (default endpoint localhost:4317)
-tracegen -insecure
+snowglobe -insecure
 
 # Clean demo with minimal services - great for presentations
-tracegen -complexity light -level 1 -insecure
+snowglobe -complexity light -level 1 -insecure
 
 # Full e-commerce topology (default)
-tracegen -level 1 -insecure
+snowglobe -level 1 -insecure
 
 # Everything including AI agentic scenarios
-tracegen -complexity heavy -level 3 -insecure
+snowglobe -complexity heavy -level 3 -insecure
 
 # Moderate load with normal error rates
-tracegen -level 5 -errors 5 -insecure
+snowglobe -level 5 -errors 5 -insecure
 
 # Simulate dead consumers (messages pile up, consumers never fire)
-tracegen -level 3 -no-consumers -insecure
+snowglobe -level 3 -no-consumers -insecure
 
 # AI scenarios only - great for LLM observability testing
-tracegen -level 3 -ai-only -insecure
+snowglobe -level 3 -ai-only -insecure
 
 # Simulate AI backend outage (LLM rate limits, timeouts)
-tracegen -level 5 -no-ai-backends -errors 5 -insecure
+snowglobe -level 5 -no-ai-backends -errors 5 -insecure
 
 # Chaos mode - maximum load and errors
-tracegen -level 10 -errors 10 -insecure
+snowglobe -level 10 -errors 10 -insecure
 
 # Send to a remote endpoint with authentication
-tracegen -endpoint otlp.example.com:443 -headers "api-key=YOUR_KEY"
+snowglobe -endpoint otlp.example.com:443 -headers "api-key=YOUR_KEY"
 
 # Multiple headers via environment variable
 export OTEL_EXPORTER_OTLP_HEADERS="api-key=SECRET,x-team=platform"
-tracegen -endpoint otlp.example.com:443
+snowglobe -endpoint otlp.example.com:443
 
 # Send to DeepCube (3D trace visualization)
-tracegen -endpoint otlp.deepcube.ai:443 -headers "API-Key=YOUR_DEEPCUBE_KEY"
+snowglobe -endpoint otlp.deepcube.ai:443 -headers "API-Key=YOUR_DEEPCUBE_KEY"
 ```
 
 ## How It Compares
@@ -407,22 +407,22 @@ Part of a small family of single-binary, zero-infra OTel tools, all Apache-2.0 a
 ## Building From Source
 
 ```bash
-git clone https://github.com/ImmersiveFusion/opentelemetry-tracegen.git
-cd opentelemetry-tracegen
-go build -o tracegen ./cmd/tracegen
+git clone https://github.com/ImmersiveFusion/snowglobe.git
+cd snowglobe
+go build -o snowglobe ./cmd/snowglobe
 ```
 
 ### Cross-compile
 
 ```bash
 # Linux
-GOOS=linux GOARCH=amd64 go build -o tracegen ./cmd/tracegen
+GOOS=linux GOARCH=amd64 go build -o snowglobe ./cmd/snowglobe
 
 # macOS (Apple Silicon)
-GOOS=darwin GOARCH=arm64 go build -o tracegen ./cmd/tracegen
+GOOS=darwin GOARCH=arm64 go build -o snowglobe ./cmd/snowglobe
 
 # Windows
-GOOS=windows GOARCH=amd64 go build -o tracegen.exe ./cmd/tracegen
+GOOS=windows GOARCH=amd64 go build -o snowglobe.exe ./cmd/snowglobe
 ```
 
 ## Design Decisions

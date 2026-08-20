@@ -62,7 +62,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: tracegen-*
+          files: snowglobe-*
           generate_release_notes: true
 
   # Build + push the multi-arch container image to Docker Hub. Published to BOTH

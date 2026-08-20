@@ -5,7 +5,7 @@ Thanks for your interest in TraceGen, a single-binary OpenTelemetry trace genera
 ## Ways to contribute
 
 - **Report a bug** or **request a feature**: open an issue with one of the [issue templates](.github/ISSUE_TEMPLATE).
-- **Add your deployment**: running TraceGen somewhere? Add it to [`WHERE-TRACEGEN-RUNS.md`](WHERE-TRACEGEN-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
+- **Add your deployment**: running TraceGen somewhere? Add it to [`WHERE-SNOWGLOBE-RUNS.md`](WHERE-SNOWGLOBE-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
 - **Send a pull request**: see below.
 
 ## Building from source
@@ -13,18 +13,18 @@ Thanks for your interest in TraceGen, a single-binary OpenTelemetry trace genera
 TraceGen is a single Go module with no runtime dependencies.
 
 ```bash
-git clone https://github.com/ImmersiveFusion/opentelemetry-tracegen.git
-cd opentelemetry-tracegen
-go build -o tracegen ./cmd/tracegen
-./tracegen -insecure   # send to a local collector on localhost:4317
+git clone https://github.com/ImmersiveFusion/snowglobe.git
+cd snowglobe
+go build -o snowglobe ./cmd/snowglobe
+./snowglobe -insecure   # send to a local collector on localhost:4317
 ```
 
 Cross-compile for another platform:
 
 ```bash
-GOOS=linux   GOARCH=arm64 go build -o tracegen     ./cmd/tracegen
-GOOS=darwin  GOARCH=arm64 go build -o tracegen     ./cmd/tracegen
-GOOS=windows GOARCH=amd64 go build -o tracegen.exe ./cmd/tracegen
+GOOS=linux   GOARCH=arm64 go build -o snowglobe     ./cmd/snowglobe
+GOOS=darwin  GOARCH=arm64 go build -o snowglobe     ./cmd/snowglobe
+GOOS=windows GOARCH=amd64 go build -o snowglobe.exe ./cmd/snowglobe
 ```
 
 ## Pull requests

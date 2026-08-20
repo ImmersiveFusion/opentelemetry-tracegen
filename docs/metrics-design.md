@@ -1,6 +1,6 @@
 # Metrics: design
 
-Status: **implemented**. See `cmd/tracegen/metrics.go`.
+Status: **implemented**. See `cmd/snowglobe/metrics.go`.
 
 This document covers what tracegen emits as OTLP metrics, why, and the constraints that shape it.
 
@@ -28,7 +28,7 @@ first.
 
 ## What exists today
 
-`newProvider()` in [`cmd/tracegen/main.go`](../cmd/tracegen/main.go) builds a `TracerProvider` and a
+`newProvider()` in [`cmd/snowglobe/main.go`](../cmd/snowglobe/main.go) builds a `TracerProvider` and a
 `LoggerProvider` per **pod**, sharing one resource (`service.name`, `service.instance.id`, `host.name`).
 Depending on `-complexity` that is roughly 20 to 59 pods across 10 to 28 services. Scenarios call
 `tracer(svc).Start(...)` directly, at around 200 call sites.

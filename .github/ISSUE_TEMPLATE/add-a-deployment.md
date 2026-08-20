@@ -1,11 +1,11 @@
 ---
 name: Add a deployment
-about: List where you run TraceGen on the WHERE-TRACEGEN-RUNS board
+about: List where you run TraceGen on the WHERE-SNOWGLOBE-RUNS board
 title: "[deployment] <your name or org>"
 labels: deployment
 ---
 
-Running TraceGen somewhere? Add it to the board. A pull request to [`WHERE-TRACEGEN-RUNS.md`](../../WHERE-TRACEGEN-RUNS.md) is the fastest path, but if you'd rather we add it, fill this in and we will.
+Running TraceGen somewhere? Add it to the board. A pull request to [`WHERE-SNOWGLOBE-RUNS.md`](../../WHERE-SNOWGLOBE-RUNS.md) is the fastest path, but if you'd rather we add it, fill this in and we will.
 
 - **Who:** <your name or org>
 - **Where it runs:** <platform + architecture, e.g. "AWS EKS, x86_64" or "a Raspberry Pi cluster">

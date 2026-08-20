@@ -1,8 +1,8 @@
 version: 2
 
 builds:
-  - main: ./cmd/tracegen
-    binary: tracegen
+  - main: ./cmd/snowglobe
+    binary: snowglobe
     env:
       - CGO_ENABLED=0
     goos:
@@ -17,7 +17,7 @@ builds:
 
 archives:
   - format: tar.gz
-    name_template: "tracegen_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "snowglobe_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         format: zip

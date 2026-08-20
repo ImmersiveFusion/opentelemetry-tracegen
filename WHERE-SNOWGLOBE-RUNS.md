@@ -35,7 +35,7 @@ That portability is the whole point: the same image runs on a laptop, a CI runne
 
 Running TraceGen somewhere: a load test, a CI pipeline, a teaching lab, a backend bake-off, a homelab, a demo of your own? **List your shit too.** This board is earned, not bought: the only entry fee is that you actually run it.
 
-Open a pull request at [github.com/ImmersiveFusion/opentelemetry-tracegen](https://github.com/ImmersiveFusion/opentelemetry-tracegen) adding a block under [The deployments](#the-deployments) using this template:
+Open a pull request at [github.com/ImmersiveFusion/snowglobe](https://github.com/ImmersiveFusion/snowglobe) adding a block under [The deployments](#the-deployments) using this template:
 
 ```markdown
 ### <Your name or org>: <one-line what>
@@ -48,7 +48,7 @@ Open a pull request at [github.com/ImmersiveFusion/opentelemetry-tracegen](https
 
 Keep it factual and specific: the specifics are the merit. No marketing, no logos-for-sale; just where the image lands and what it does there. A maintainer will review and merge; entries that name a platform, a use case, and a version (or a link) move fastest.
 
-Prefer not to write the PR yourself? [Open an issue](https://github.com/ImmersiveFusion/opentelemetry-tracegen/issues/new) with the same details and we'll add it.
+Prefer not to write the PR yourself? [Open an issue](https://github.com/ImmersiveFusion/snowglobe/issues/new) with the same details and we'll add it.
 
 ---
 

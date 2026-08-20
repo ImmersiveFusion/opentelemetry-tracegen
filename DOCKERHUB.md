@@ -57,6 +57,6 @@ The traces are real, and you can watch them flow. TraceGen feeds live demo grids
 
 ## Source, issues, full docs
 
-[github.com/ImmersiveFusion/opentelemetry-tracegen](https://github.com/ImmersiveFusion/opentelemetry-tracegen)
+[github.com/ImmersiveFusion/snowglobe](https://github.com/ImmersiveFusion/snowglobe)
 
 Apache-2.0. Built by Immersive Fusion.

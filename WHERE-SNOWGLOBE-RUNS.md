@@ -1,8 +1,8 @@
-# Where TraceGen Runs
+# Where Snowglobe Runs
 
 **One container. 5.7 MB. It runs anywhere, and this is the board of where it actually does.**
 
-TraceGen ships as a single distroless, multi-arch image (`linux/amd64` + `linux/arm64`), no Compose, no multi-gigabyte RAM footprint, no microservices to stand up:
+Snowglobe ships as a single distroless, multi-arch image (`linux/amd64` + `linux/arm64`), no Compose, no multi-gigabyte RAM footprint, no microservices to stand up:
 
 ```bash
 # -insecure = plaintext gRPC for a local collector (skips TLS); drop it for a remote, authenticated endpoint
@@ -18,7 +18,7 @@ That portability is the whole point: the same image runs on a laptop, a CI runne
 ### Immersive Fusion: live public demo grids
 
 - **Where it runs:** the **Immersive Fusion cloud**: seven always-on workloads on Kubernetes, deployments managed declaratively via GitOps (Argo CD).
-- **What for:** **seven always-on public demo grids**, each one a separate TraceGen deployment streaming live OpenTelemetry traces, logs and metrics into [DeepCube (TM)](https://deepcube.ai)'s 3D player, so anyone can open it and watch *real data moving* instead of a canned recording. Each grid is tuned to tell one story:
+- **What for:** **seven always-on public demo grids**, each one a separate Snowglobe deployment streaming live OpenTelemetry traces, logs and metrics into [DeepCube (TM)](https://deepcube.ai)'s 3D player, so anyone can open it and watch *real data moving* instead of a canned recording. Each grid is tuned to tell one story:
   - **traditional-clean**, a healthy e-commerce platform: the calm, mostly-green reference graph.
   - **ai-flagship**, an AI-native application, observed: a RAG pipeline, an AI chatbot, content moderation, and a multi-step agent emitting full OTel GenAI spans.
   - **blended**, the real world, traditional + AI together: classic microservices and AI services sharing one trace graph, with real error traffic.
@@ -33,7 +33,7 @@ That portability is the whole point: the same image runs on a laptop, a CI runne
 
 ## Add your deployment
 
-Running TraceGen somewhere: a load test, a CI pipeline, a teaching lab, a backend bake-off, a homelab, a demo of your own? **List your shit too.** This board is earned, not bought: the only entry fee is that you actually run it.
+Running Snowglobe somewhere: a load test, a CI pipeline, a teaching lab, a backend bake-off, a homelab, a demo of your own? **List your shit too.** This board is earned, not bought: the only entry fee is that you actually run it.
 
 Open a pull request at [github.com/ImmersiveFusion/snowglobe](https://github.com/ImmersiveFusion/snowglobe) adding a block under [The deployments](#the-deployments) using this template:
 
@@ -41,7 +41,7 @@ Open a pull request at [github.com/ImmersiveFusion/snowglobe](https://github.com
 ### <Your name or org>: <one-line what>
 
 - **Where it runs:** <platform + architecture, e.g. "AWS EKS, x86_64" or "a Raspberry Pi cluster">
-- **What for:** <the use case, what TraceGen is doing for you>
+- **What for:** <the use case, what Snowglobe is doing for you>
 - **Flavor:** <container or binary; the image tag you run, e.g. immersivefusion/snowglobe:0.6.1; roughly how many instances / how hard you push it>
 - **Link:** <optional but encouraged, a live URL, a blog post, or a repo; it's the best proof>
 ```

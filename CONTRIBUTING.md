@@ -1,16 +1,16 @@
-# Contributing to TraceGen
+# Contributing to Snowglobe
 
-Thanks for your interest in TraceGen, a single-binary OpenTelemetry trace generator. Bug reports, feature ideas, code, and docs are all welcome.
+Thanks for your interest in Snowglobe, a single-binary OpenTelemetry trace generator. Bug reports, feature ideas, code, and docs are all welcome.
 
 ## Ways to contribute
 
 - **Report a bug** or **request a feature**: open an issue with one of the [issue templates](.github/ISSUE_TEMPLATE).
-- **Add your deployment**: running TraceGen somewhere? Add it to [`WHERE-SNOWGLOBE-RUNS.md`](WHERE-SNOWGLOBE-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
+- **Add your deployment**: running Snowglobe somewhere? Add it to [`WHERE-SNOWGLOBE-RUNS.md`](WHERE-SNOWGLOBE-RUNS.md) via a pull request, or use the "Add a deployment" issue template and we'll add it for you.
 - **Send a pull request**: see below.
 
 ## Building from source
 
-TraceGen is a single Go module with no runtime dependencies.
+Snowglobe is a single Go module with no runtime dependencies.
 
 ```bash
 git clone https://github.com/ImmersiveFusion/snowglobe.git
@@ -60,7 +60,7 @@ trigger does not retroactively run it. Push a new (higher) version tag instead.
 
 ## Reporting issues
 
-Use the issue templates. For bugs, include your platform/architecture, the exact `tracegen` command and flags, and what you expected versus what happened. `-log-level debug` gives more detail.
+Use the issue templates. For bugs, include your platform/architecture, the exact `snowglobe` command and flags, and what you expected versus what happened. `-log-level debug` gives more detail.
 
 ## Code of conduct
 

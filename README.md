@@ -1,14 +1,24 @@
-# OpenTelemetry Trace Generator
+# Snowglobe
 
-A single-binary distributed trace generator that produces realistic, topology-rich OTLP traces, correlated logs, and metrics derived from those same traces. No Docker Compose, no microservices to deploy, no infrastructure - just one executable (or a 5.7 MB container) that simulates a full e-commerce platform with up to 28 services, dozens of pods that scale with the topology, and 40 scenario flows - including AI agentic scenarios with full OTel GenAI semantic conventions. Three complexity levels (light/normal/heavy) let you scale from a clean 10-service demo to the full topology with AI.
+**A sealed world you can shake.**
 
-**A public good for the OpenTelemetry community.** Apache-2.0, no account, no sign-up, no lock-in. The output is plain OTLP, so it works in whatever you already run: Jaeger, Tempo, Grafana, an OpenTelemetry Collector, or spatial tools such as DeepCube. Use it to test an observability platform, load test a trace pipeline, or show a distributed system to someone who has never seen one, for both traditional APM and LLM observability.
+One binary that generates a whole distributed system's telemetry: logs, traces and metrics from a 28-service topology with the shapes real systems actually make. Diamond dependencies, scatter-gather fan-out, sagas that compensate, timeouts that cascade. Point it at anything that speaks OTLP and watch it arrive.
+
+No Docker Compose. No microservices to deploy. No 6GB stack to babysit. One executable, or a 5.7 MB container.
+
+```bash
+docker run --rm immersivefusion/snowglobe -insecure -endpoint host.docker.internal:4317
+```
+
+**A public good for the OpenTelemetry community.** Apache-2.0, no account, no sign-up, no lock-in. The output is plain OTLP, so it works in whatever you already run: Jaeger, Tempo, Grafana, SigNoz, an OpenTelemetry Collector, or spatial tools such as DeepCube, which are one consumer among many.
+
+**How this differs from `telemetrygen`.** `telemetrygen` generates spans, and it is the official tool and good at that. Snowglobe generates a *system*: a topology with real dependency shapes, injectable failures, and AI agent spans under the OTel GenAI semantic conventions. **If you need load, use `telemetrygen`. If you need something that looks like a production incident, that is what this is for.**
 
 Most trace generators die. Their repos go quiet, the SDKs move, and the thing stops building. This one is maintained, and that is the point of it.
 
-**It has a sibling.** tracegen makes realistic telemetry out of nothing: **synthetic** OTel. [sos-beacon](https://github.com/ImmersiveFusion/sos-beacon) is the **organic** counterpart, a real workload doing a real job that emits real telemetry as a byproduct. Between them you can fill a backend with either kind.
+**It has a sibling.** Snowglobe makes realistic telemetry out of nothing: **synthetic** OTel. [sos-beacon](https://github.com/ImmersiveFusion/sos-beacon) is the **organic** counterpart, a real workload doing a real job that emits real telemetry as a byproduct. Between them you can fill a backend with either kind.
 
-![TraceGen traces in DeepCube's 3D player](.img/screenshot.png)
+![Snowglobe traces in DeepCube's 3D player](.img/screenshot.png)
 
 ## Why This Exists
 
@@ -40,11 +50,11 @@ snowglobe -endpoint your-otlp-endpoint:443
 
 **Installed from an old path?** Releases up to v0.7.7 were published as `github.com/ImmersiveFusion/if-opentelemetry-tracegen`, and releases up to v0.8.0 as `github.com/ImmersiveFusion/opentelemetry-tracegen`. Pinned installs of those versions keep working, but `@latest` on either old path stops resolving from the next release onward, so update your command to the path above. The installed binary is now named `snowglobe` rather than `tracegen`.
 
-> **See it in 3D** - Send traces to [DeepCube](https://deepcube.ai) (`snowglobe -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
+> **See it in 3D** - Send traces to [DeepCube](https://deepcube.ai) (`snowglobe -endpoint otlp.deepcube.ai:443 -headers "api-key=YOUR_KEY"`, [how to get a key](https://docs.deepcube.ai/Getting-Started/Api-Key/)) to explore them as a 3D force-directed graph, drill into conventional trace waterfalls for detailed analysis, and get AI-assisted insights from [Tessa](https://deepcube.ai). For a ready-made example without any setup, try the [OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/shoebox) at [chaos.deepcube.ai](https://chaos.deepcube.ai) - a fully interactive sandbox with visual failure injection.
 
 ## Live demo grids: see it running
 
-![The seven demo grids streaming live, in motion](.img/tracegen.gif)
+![The seven demo grids streaming live into DeepCube's 3D player](.img/deepcube.gif)
 
 Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics into DeepCube's 3D player right now: a clean baseline, an AI-native app, a blended environment, phantom-service detection, an AI-outage, and a full incident. Each grid is this container, deployed declaratively via GitOps (Argo CD) in the Immersive Fusion cloud, multi-arch and distroless, one matrix row per grid, shipping to `otlp.deepcube.ai:443`.
 
@@ -52,7 +62,7 @@ Seven always-on demo grids stream live OpenTelemetry traces, logs and metrics in
 
 **See them in 3D:** the full experience is [DeepCube](https://docs.deepcube.ai/DC/3D/), the immersive 3D client: install it and open a grid to walk the live traces. On mobile or can't install right now? [DeepCube Web](https://docs.deepcube.ai/DC/Web/) runs the same grids in your browser at [portal.deepcube.ai](https://portal.deepcube.ai).
 
-**[Where else does TraceGen run?](WHERE-SNOWGLOBE-RUNS.md)**: a community board of deployments. Add yours.
+**[Where else does Snowglobe run?](WHERE-SNOWGLOBE-RUNS.md)**: a community board of deployments. Add yours.
 
 ## Features
 
@@ -181,7 +191,7 @@ Metrics aggregate in process and flush on an interval, so unlike traces their vo
 
 **The queue depth is the one to watch.** Producer spans increment it and consumer spans decrement it, so running with `-no-consumers` makes the backlog climb without bound while the trace graph still looks busy. That is a story traces alone can only imply.
 
-**Naming.** Where OpenTelemetry defines a metric, TraceGen uses its name and conforms to its contract, including seconds as the unit. Everything else lives under a `tracegen.` prefix rather than extending a semconv namespace.
+**Naming.** Where OpenTelemetry defines a metric, Snowglobe uses its name and conforms to its contract, including seconds as the unit. Everything else lives under a `tracegen.` prefix rather than extending a semconv namespace.
 
 **Cardinality.** `service.instance.id` is deliberately **off** by default: it multiplies every series by the pod count (up to 59 at `-complexity heavy`), and metric backends commonly bill per active series with no cardinality control on an OTLP push path. Turn it on with `-metrics-instance-id` when per-pod resolution is the thing you are demonstrating. Metric attributes are an explicit allowlist, never a copy of the span's attributes, so user, session and order ids never reach a metric.
 
@@ -256,7 +266,7 @@ The generated traces simulate a .NET-based e-commerce platform with AI capabilit
 ## Usage
 
 ```
-tracegen [flags]
+snowglobe [flags]
 
 Flags:
   -endpoint string     OTLP gRPC endpoint host:port (default "localhost:4317")
@@ -352,7 +362,7 @@ snowglobe -endpoint otlp.deepcube.ai:443 -headers "API-Key=YOUR_DEEPCUBE_KEY"
 
 ## How It Compares
 
-| Capability | tracegen | OTel telemetrygen | OTel Astronomy Shop | Jaeger HotROD | k6 + xk6-tracing |
+| Capability | Snowglobe | OTel telemetrygen | OTel Astronomy Shop | Jaeger HotROD | k6 + xk6-tracing |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Single binary, zero infra | **Yes** | 1 binary | 15+ containers, ~6GB | 4 containers | k6 + extension |
 | Services | **28** | 1 | ~22 | 4 | User-defined |
@@ -401,8 +411,8 @@ The AI agentic traces are also compatible with LLM-specialized observability too
 
 Part of a small family of single-binary, zero-infra OTel tools, all Apache-2.0 and all usable without any Immersive Fusion account:
 
-- **[sos-beacon](https://github.com/ImmersiveFusion/sos-beacon)** - The **organic** counterpart to this tool's synthetic output. A real workload doing a real job (surfacing people asking for help in public forums, for a human to answer), OTel-instrumented, so it emits genuine production telemetry as a byproduct. Where tracegen invents a system, sos-beacon *is* one.
-- **[OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/opentelemetry-chaos-sim)** - Interactive chaos engineering sandbox with visual failure injection. Complements tracegen: generate topology-rich traces here, inject chaos there, [visualize both in 3D](https://chaos.deepcube.ai).
+- **[sos-beacon](https://github.com/ImmersiveFusion/sos-beacon)** - The **organic** counterpart to this tool's synthetic output. A real workload doing a real job (surfacing people asking for help in public forums, for a human to answer), OTel-instrumented, so it emits genuine production telemetry as a byproduct. Where Snowglobe invents a system, sos-beacon *is* one.
+- **[OpenTelemetry Chaos Simulator](https://github.com/ImmersiveFusion/shoebox)** - Interactive chaos engineering sandbox with visual failure injection. Complements Snowglobe: generate topology-rich traces here, inject chaos there, [visualize both in 3D](https://chaos.deepcube.ai).
 
 ## Building From Source
 
